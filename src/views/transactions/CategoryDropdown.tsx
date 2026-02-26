@@ -21,7 +21,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState<'bottom' | 'top'>('bottom');
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({ position: 'fixed', opacity: 0, pointerEvents: 'none' });
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -58,13 +58,18 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
       setPosition(newPosition);
       setDropdownStyle({
         position: 'fixed',
-        top: Math.round(top || 0) || undefined,
-        bottom: Math.round(bottom || 0) || undefined,
+        top: top !== undefined ? Math.round(top) : undefined,
+        bottom: bottom !== undefined ? Math.round(bottom) : undefined,
         left: Math.round(rect.left),
         width: Math.round(rect.width),
         maxHeight: '40vh',
         zIndex: 50,
+        opacity: 1,
+        pointerEvents: 'auto',
       });
+    } else if (!isOpen) {
+      // Reset style to prevent flashing on next open
+      setDropdownStyle({ position: 'fixed', opacity: 0, pointerEvents: 'none' });
     }
   }, [isOpen]);
 
