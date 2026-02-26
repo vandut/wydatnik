@@ -1,0 +1,41 @@
+I just imported CSV file containing single line "invalid file". I got successful import notification, but that file was incorrect! The correct file must contain the header and at least one transaction. If not, then error should be reported. If success, then modal should display how many transactions were imported, from what time range (start/end).
+
+Here is an example file with correct mBank format:
+
+```
+mBank S.A. Bankowość Detaliczna;
+		Skrytka Pocztowa 2108;
+		90-959 Łódź 2;
+		www.mBank.pl;
+		mLinia: 801 300 800;
+		+48 (42) 6 300 800;
+		
+
+#Klient;
+JAN MARIAN PAZUR;
+
+Lista operacji;
+
+#Za okres:;
+01.02.2026;26.02.2026;
+
+#zgodnie z wybranymi filtrami wyszukiwania;
+      #dla rachunków:;
+      Konto1 - XXXXXXXXX;
+      Konto2 - XXXXXXXXX;
+      Karta debetowa - XXXX********XXXX;
+      
+      #Lista nie jest dokumentem w rozumieniu art. 7 Ustawy Prawo Bankowe (Dz. U. Nr 140 z 1997 roku, poz.939 z późniejszymi zmianami), ponieważ operacje można samodzielnie edytować.;
+      
+      #Waluta;#Wpływy;#Wydatki;
+PLN;17 193,71;-10 749,90;
+      
+#Data operacji;#Opis operacji;#Rachunek;#Kategoria;#Kwota;
+2026-02-25;"Biedronka  ZAKUP PRZY UŻYCIU KARTY W KRAJU                                                     transakcja nierozliczona";"Konto1 XXXX ... XXXX";"Żywność i chemia domowa";-9,69 PLN;;
+2026-02-25;"Żabka  ZAKUP PRZY UŻYCIU KARTY W KRAJU                                                     transakcja nierozliczona";"Konto1 XXXX ... XXXX";"Inne";-15,50 PLN;;
+2026-02-23;"Żabka  ZAKUP PRZY UŻYCIU KARTY W KRAJU                                                     ";"Konto1 XXXX ... XXXX";"Inne";-15,50 PLN;;
+```
+
+Notice transactions titles "ZAKUP PRZY UŻYCIU KARTY W KRAJU" which can be removed and "transakcja nierozliczona" which also can be removed".
+
+The category can be ignored when imported for now and everything is none category.
