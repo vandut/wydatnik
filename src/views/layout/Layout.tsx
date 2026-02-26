@@ -8,8 +8,8 @@ import {
   Wallet, 
   ListOrdered, 
   Tags, 
-  Download, 
-  Upload, 
+  Save, 
+  FolderOpen, 
   Menu
 } from 'lucide-react';
 
@@ -57,18 +57,18 @@ const DesktopSidebar: React.FC<{
     <div className="p-4 border-t border-slate-200 space-y-2">
       <div className="flex gap-2">
         <button 
-          onClick={handleSave}
-          className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
-        >
-          <Download className="w-3.5 h-3.5" />
-          {t('save')}
-        </button>
-        <button 
           onClick={() => fileInputRef.current?.click()}
           className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
         >
-          <Upload className="w-3.5 h-3.5" />
+          <FolderOpen className="w-3.5 h-3.5" />
           {t('load')}
+        </button>
+        <button 
+          onClick={handleSave}
+          className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
+        >
+          <Save className="w-3.5 h-3.5" />
+          {t('save')}
         </button>
         <input 
           type="file" 
@@ -97,20 +97,20 @@ const MobileHeader: React.FC<{
     </div>
     <div className="flex items-center gap-2">
       <button 
-        onClick={handleSave}
-        className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
-        title={t('save')}
-      >
-        <Download className="w-5 h-5 md:w-4 md:h-4" />
-        <span className="hidden md:inline">{t('save')}</span>
-      </button>
-      <button 
         onClick={() => fileInputRef.current?.click()}
         className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
         title={t('load')}
       >
-        <Upload className="w-5 h-5 md:w-4 md:h-4" />
+        <FolderOpen className="w-5 h-5 md:w-4 md:h-4" />
         <span className="hidden md:inline">{t('load')}</span>
+      </button>
+      <button 
+        onClick={handleSave}
+        className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
+        title={t('save')}
+      >
+        <Save className="w-5 h-5 md:w-4 md:h-4" />
+        <span className="hidden md:inline">{t('save')}</span>
       </button>
       {location.pathname === '/transactions' && (
         <>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '../../i18n/I18nContext';
 import { Category } from '../../types';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface CategoryDropdownProps {
@@ -10,6 +10,7 @@ interface CategoryDropdownProps {
   categories: Category[];
   onChange: (categoryId: string | null) => void;
   getCategoryEmoji: (id: string | null) => string;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
@@ -17,6 +18,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   categories,
   onChange,
   getCategoryEmoji,
+  onOpenChange,
 }) => {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({ position: 'fixed', opacity: 0, pointerEvents: 'none' });
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
   const mainCategories = categories.filter(c => !c.parentId);
 
@@ -33,7 +36,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
     : null;
 
   const mainLabel = parentCategory ? parentCategory.name : (selectedCategory ? selectedCategory.name : t('uncategorized'));
-  const subLabel = parentCategory ? selectedCategory.name : (selectedCategory ? t('mainCategory') : t('selectCategory'));
+  const subLabel = parentCategory ? selectedCategory.name : '—';
   const emoji = getCategoryEmoji(categoryId);
 
   useLayoutEffect(() => {
@@ -71,29 +74,43 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
       // Reset style to prevent flashing on next open
       setDropdownStyle({ position: 'fixed', opacity: 0, pointerEvents: 'none' });
     }
-  }, [isOpen]);
+    
+    onOpenChange?.(isOpen);
+  }, [isOpen, onOpenChange]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
-        dropdownRef.current && 
-        !dropdownRef.current.contains(event.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(event.target as Node)
+        (dropdownRef.current && dropdownRef.current.contains(target)) ||
+        (mobileDropdownRef.current && mobileDropdownRef.current.contains(target)) ||
+        (triggerRef.current && triggerRef.current.contains(target))
       ) {
-        setIsOpen(false);
+        return;
       }
+      setIsOpen(false);
+    };
+
+    const handleScroll = (event: Event) => {
+      const target = event.target as Node;
+      if (
+        (dropdownRef.current && dropdownRef.current.contains(target)) ||
+        (mobileDropdownRef.current && mobileDropdownRef.current.contains(target))
+      ) {
+        return;
+      }
+      setIsOpen(false);
     };
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       // Also close on scroll to prevent detached dropdown
-      document.addEventListener('scroll', () => setIsOpen(false), true);
+      document.addEventListener('scroll', handleScroll, true);
       window.addEventListener('resize', () => setIsOpen(false));
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('scroll', () => setIsOpen(false), true);
+      document.removeEventListener('scroll', handleScroll, true);
       window.removeEventListener('resize', () => setIsOpen(false));
     };
   }, [isOpen]);
@@ -112,12 +129,12 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
           categoryId === null ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"
         )}
       >
-        <span className="w-5 text-center">❓</span>
+        <span className="w-6 text-center text-base">❓</span>
         <span>{t('uncategorized')}</span>
       </button>
       
       {mainCategories.map(main => (
-        <div key={main.id} className="mt-1">
+        <div key={main.id} className="mt-2">
           <button
             onClick={() => handleSelect(main.id)}
             className={cn(
@@ -125,23 +142,32 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
               categoryId === main.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50 font-medium"
             )}
           >
-            <span className="w-5 text-center">{main.emoji}</span>
+            <span className="w-6 text-center text-base">{main.emoji}</span>
             <span>{main.name}</span>
           </button>
           
-          <div className="pl-6 mt-0.5 space-y-0.5">
+          <div className="relative mt-0.5">
+            {categories.filter(c => c.parentId === main.id).length > 0 && (
+              <div 
+                className="absolute left-[20px] top-0 w-px bg-slate-200" 
+                style={{ bottom: '14px' }}
+              />
+            )}
+            
             {categories.filter(c => c.parentId === main.id).map(sub => (
-              <button
-                key={sub.id}
-                onClick={() => handleSelect(sub.id)}
-                className={cn(
-                  "w-full text-left px-2 py-1 rounded-md text-xs transition-colors flex items-center gap-2",
-                  categoryId === sub.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
-                )}
-              >
-                <div className="w-1 h-1 rounded-full bg-slate-300" />
-                <span>{sub.name}</span>
-              </button>
+              <div key={sub.id} className="relative flex items-center pl-[38px] pr-2">
+                <div className="absolute left-[20px] top-1/2 w-4 h-px bg-slate-200" />
+                
+                <button
+                  onClick={() => handleSelect(sub.id)}
+                  className={cn(
+                    "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors",
+                    categoryId === sub.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
+                  )}
+                >
+                  {sub.name}
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -156,8 +182,8 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full bg-white border hover:border-slate-300 py-1.5 px-2 flex items-center gap-2 text-left focus:outline-none",
-          isOpen ? "border-indigo-500" : "border-slate-200 rounded-xl",
+          "w-full bg-white border py-1.5 px-2 flex items-center gap-2 text-left focus:outline-none",
+          isOpen ? "border-indigo-500" : "border-slate-200 hover:border-slate-300 rounded-xl",
           isOpen && position === 'bottom' && "rounded-t-xl rounded-b-none border-b-transparent",
           isOpen && position === 'top' && "rounded-b-xl rounded-t-none border-t-transparent"
         )}
@@ -173,7 +199,11 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
             {subLabel}
           </div>
         </div>
-        <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 mr-1" />
+        {isOpen ? (
+          <ChevronUp className="w-4 h-4 text-slate-400 shrink-0 mr-1" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 mr-1" />
+        )}
       </button>
 
       {/* Desktop Dropdown via Portal */}
@@ -181,21 +211,23 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
         <div
           ref={dropdownRef}
           className={cn(
-            "hidden md:block bg-white border border-indigo-500 shadow-lg overflow-y-auto",
+            "hidden lg:block bg-white border border-indigo-500 shadow-lg overflow-y-auto",
             position === 'bottom' ? "rounded-b-xl rounded-t-none border-t-0" : "rounded-t-xl rounded-b-none border-b-0"
           )}
           style={dropdownStyle}
         >
+          {position === 'bottom' && <div className="mx-auto w-[calc(100%-16px)] h-px bg-slate-200 mb-1" />}
           {dropdownContent}
+          {position === 'top' && <div className="mx-auto w-[calc(100%-16px)] h-px bg-slate-200 mt-1" />}
         </div>,
         document.body
       )}
 
       {/* Mobile Modal */}
       {isOpen && createPortal(
-        <div className="md:hidden fixed inset-0 z-[60] flex flex-col bg-black/50">
-          <div className="flex-1" onClick={() => setIsOpen(false)} />
-          <div className="bg-white rounded-t-2xl flex flex-col max-h-[80vh]">
+        <div className="lg:hidden fixed inset-0 z-[60] flex flex-col bg-black/50 animate-in fade-in duration-200 md:items-center md:justify-end md:p-4">
+          <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
+          <div ref={mobileDropdownRef} className="bg-white rounded-t-2xl md:rounded-2xl flex flex-col max-h-[80vh] w-full md:max-w-sm animate-in slide-in-from-bottom-8 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
               <h2 className="text-lg font-semibold text-slate-800">{t('selectCategory')}</h2>
               <button 

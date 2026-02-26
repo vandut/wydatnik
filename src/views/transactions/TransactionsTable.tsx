@@ -144,13 +144,34 @@ const MobileTableHeader: React.FC<{
   );
 };
 
-const NoTransactionsRow: React.FC = () => {
+const NoTransactionsRow: React.FC<{
+  selectedCategory: string;
+  categories: Category[];
+}> = ({ selectedCategory, categories }) => {
   const { t } = useI18n();
+  
+  let emptyMessage = t('noTransactions');
+  let icon = null;
+
+  if (selectedCategory === 'uncategorized') {
+    emptyMessage = `${t('noTransactions')} - ${t('uncategorized')}`;
+    icon = <span className="text-2xl mb-2 block">❓</span>;
+  } else if (selectedCategory !== 'all') {
+    const cat = categories.find(c => c.id === selectedCategory);
+    if (cat) {
+      emptyMessage = `${t('noTransactions')} - ${cat.name}`;
+      icon = <span className="text-2xl mb-2 block">{cat.emoji || '❓'}</span>;
+    }
+  }
+
   return (
     <tbody>
       <tr>
-        <td colSpan={5} className="p-8 text-center text-slate-500">
-          {t('noTransactions')}
+        <td colSpan={5} className="p-12 text-center text-slate-500">
+          <div className="flex flex-col items-center justify-center">
+            {icon}
+            <span>{emptyMessage}</span>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -166,6 +187,8 @@ const TransactionRowFull: React.FC<{
   formatCurrency: (amount: number) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
+  openDropdownId: string | null;
+  setOpenDropdownId: (id: string | null) => void;
 }> = ({
   transaction,
   isSelected,
@@ -175,6 +198,8 @@ const TransactionRowFull: React.FC<{
   formatCurrency,
   getCategoryEmoji,
   isTabletMinimized,
+  openDropdownId,
+  setOpenDropdownId,
 }) => {
   return (
     <tr className={cn("hidden", isTabletMinimized ? "lg:table-row" : "xl:table-row")}>
@@ -200,6 +225,7 @@ const TransactionRowFull: React.FC<{
           categories={categories}
           onChange={(categoryId) => onUpdateCategory(transaction.id, categoryId)}
           getCategoryEmoji={getCategoryEmoji}
+          onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? transaction.id : null)}
         />
       </td>
       <td className={cn("p-4 text-right font-medium whitespace-nowrap", transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
@@ -218,6 +244,8 @@ const TransactionRowMid: React.FC<{
   formatCurrency: (amount: number) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
+  openDropdownId: string | null;
+  setOpenDropdownId: (id: string | null) => void;
 }> = ({
   transaction,
   isSelected,
@@ -227,6 +255,8 @@ const TransactionRowMid: React.FC<{
   formatCurrency,
   getCategoryEmoji,
   isTabletMinimized,
+  openDropdownId,
+  setOpenDropdownId,
 }) => {
   return (
     <>
@@ -260,6 +290,7 @@ const TransactionRowMid: React.FC<{
             categories={categories}
             onChange={(categoryId) => onUpdateCategory(transaction.id, categoryId)}
             getCategoryEmoji={getCategoryEmoji}
+            onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? transaction.id : null)}
           />
         </td>
       </tr>
@@ -275,6 +306,8 @@ const TransactionRowSmall: React.FC<{
   onUpdateCategory: (transactionId: string, categoryId: string | null) => void;
   formatCurrency: (amount: number) => string;
   getCategoryEmoji: (id: string | null) => string;
+  openDropdownId: string | null;
+  setOpenDropdownId: (id: string | null) => void;
 }> = ({
   transaction,
   isSelected,
@@ -283,6 +316,8 @@ const TransactionRowSmall: React.FC<{
   onUpdateCategory,
   formatCurrency,
   getCategoryEmoji,
+  openDropdownId,
+  setOpenDropdownId,
 }) => {
   return (
     <>
@@ -320,6 +355,7 @@ const TransactionRowSmall: React.FC<{
             categories={categories}
             onChange={(categoryId) => onUpdateCategory(transaction.id, categoryId)}
             getCategoryEmoji={getCategoryEmoji}
+            onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? transaction.id : null)}
           />
         </td>
       </tr>
@@ -340,6 +376,7 @@ interface TransactionsTableProps {
   formatCurrency: (amount: number) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
+  selectedCategory: string;
 }
 
 const TransactionsTable: React.FC<TransactionsTableProps> = ({
@@ -353,10 +390,12 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   formatCurrency,
   getCategoryEmoji,
   isTabletMinimized,
+  selectedCategory,
 }) => {
   const { t } = useI18n();
   const { state, dispatch } = useAppContext();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   const isAllSelected = filteredTransactions.length > 0 && selectedTransactions.size === filteredTransactions.length;
   const isNoneAvailable = filteredTransactions.length === 0;
@@ -427,10 +466,10 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
             />
           </thead>
           {isNoneAvailable ? (
-            <NoTransactionsRow />
+            <NoTransactionsRow selectedCategory={selectedCategory} categories={categories} />
           ) : (
             filteredTransactions.map(transaction => (
-              <tbody key={transaction.id} className={cn("hover:bg-slate-50/80 transition-colors border-b xl:border-none border-slate-100", selectedTransactions.has(transaction.id) && "bg-indigo-50/30")}>
+              <tbody key={transaction.id} className={cn("transition-colors border-b xl:border-none border-slate-100", selectedTransactions.has(transaction.id) && "bg-indigo-50/30", openDropdownId === transaction.id ? "" : "hover:bg-slate-50/80")}>
                 {/* Desktop Row */}
                 <TransactionRowFull
                   transaction={transaction}
@@ -441,6 +480,8 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   formatCurrency={formatCurrency}
                   getCategoryEmoji={getCategoryEmoji}
                   isTabletMinimized={isTabletMinimized}
+                  openDropdownId={openDropdownId}
+                  setOpenDropdownId={setOpenDropdownId}
                 />
 
                 {/* Mid Row */}
@@ -453,6 +494,8 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   formatCurrency={formatCurrency}
                   getCategoryEmoji={getCategoryEmoji}
                   isTabletMinimized={isTabletMinimized}
+                  openDropdownId={openDropdownId}
+                  setOpenDropdownId={setOpenDropdownId}
                 />
 
                 {/* Mobile Row */}
@@ -464,6 +507,8 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   onUpdateCategory={onUpdateCategory}
                   formatCurrency={formatCurrency}
                   getCategoryEmoji={getCategoryEmoji}
+                  openDropdownId={openDropdownId}
+                  setOpenDropdownId={setOpenDropdownId}
                 />
               </tbody>
             ))

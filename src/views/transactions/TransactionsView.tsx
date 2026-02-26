@@ -153,7 +153,15 @@ const TransactionsView: React.FC = () => {
     baseFiltered.forEach(t => {
       const cat = state.categories.find(c => c.id === t.categoryId);
       const mainCatId = cat?.parentId || cat?.id || 'uncategorized';
+      const subCatId = cat?.parentId ? cat.id : null;
+      
+      // Add to main category
       summary[mainCatId] = (summary[mainCatId] || 0) + t.amount;
+      
+      // Add to subcategory if it exists
+      if (subCatId) {
+        summary[subCatId] = (summary[subCatId] || 0) + t.amount;
+      }
     });
     return summary;
   }, [state.transactions, selectedMonth, state.categories]);
@@ -255,6 +263,7 @@ const TransactionsView: React.FC = () => {
             formatCurrency={formatCurrency}
             getCategoryEmoji={getCategoryEmoji}
             isTabletMinimized={isTabletMinimized}
+            selectedCategory={selectedCategory}
           />
         </div>
       </div>
