@@ -39,50 +39,57 @@ const DesktopTableHeader: React.FC<{
 }> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onDelete, isTabletMinimized }) => {
   const { t } = useI18n();
   
-  if (selectedCount > 0) {
-    return (
-      <tr className={cn("bg-indigo-50/50 hidden", isTabletMinimized ? "sm:table-row" : "lg:table-row")}>
+  return (
+    <>
+      <tr className={cn("hidden h-[66px]", isTabletMinimized ? "sm:table-row" : "lg:table-row", selectedCount > 0 ? "bg-indigo-50" : "bg-slate-50")}>
         <th className="p-4 w-12 align-middle">
           <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
         </th>
-        <th colSpan={4} className="p-2 font-normal">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-indigo-800">
-              {selectedCount} {t('selected')}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onMerge}
-                disabled={selectedCount < 2}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-              >
-                <Merge className="w-4 h-4" />
-                {t('merge')}
-              </button>
-              <button
-                onClick={onDelete}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-rose-600 text-sm font-medium rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
-              >
-                <Trash2 className="w-4 h-4" />
-                {t('delete')}
-              </button>
+        {selectedCount > 0 ? (
+          <th colSpan={4} className="p-4 font-normal align-middle">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-indigo-800">
+                {selectedCount} {t('selected')}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onMerge}
+                  disabled={selectedCount < 2}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
+                  <Merge className="w-4 h-4" />
+                  {t('merge')}
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-rose-600 text-sm font-medium rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {t('delete')}
+                </button>
+              </div>
             </div>
-          </div>
-        </th>
+          </th>
+        ) : (
+          <>
+            <th className="p-4 w-32 align-middle">{t('date')}</th>
+            <th className="p-4 w-[40%] align-middle">{t('title')}</th>
+            <th className="p-4 w-64 align-middle">{t('category')}</th>
+            <th className="p-4 text-right align-middle">{t('amount')}</th>
+          </>
+        )}
       </tr>
-    );
-  }
-
-  return (
-    <tr className={cn("hidden", isTabletMinimized ? "sm:table-row" : "lg:table-row")}>
-      <th className="p-4 w-12 align-middle">
-        <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
-      </th>
-      <th className="p-4 w-32">{t('date')}</th>
-      <th className="p-4 w-[40%]">{t('title')}</th>
-      <th className="p-4 w-64">{t('category')}</th>
-      <th className="p-4 text-right">{t('amount')}</th>
-    </tr>
+      {/* Invisible row to preserve column widths when selection is active */}
+      {selectedCount > 0 && (
+        <tr className={cn("hidden invisible h-0", isTabletMinimized ? "sm:table-row" : "lg:table-row")}>
+          <th className="p-0 w-12"></th>
+          <th className="p-0 w-32"></th>
+          <th className="p-0 w-[40%]"></th>
+          <th className="p-0 w-64"></th>
+          <th className="p-0"></th>
+        </tr>
+      )}
+    </>
   );
 };
 
@@ -99,11 +106,11 @@ const MobileTableHeader: React.FC<{
   
   if (selectedCount > 0) {
     return (
-      <tr className={cn("border-b border-slate-200 bg-indigo-50/50", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
+      <tr className={cn("border-b border-slate-200 bg-indigo-50 h-[54px]", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
         <th className="p-3 w-10 align-middle">
           <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
         </th>
-        <th className="p-2 font-normal">
+        <th className="p-3 font-normal align-middle">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-indigo-800">
               {selectedCount} {t('selected')}
@@ -130,11 +137,11 @@ const MobileTableHeader: React.FC<{
   }
 
   return (
-    <tr className={cn("border-b border-slate-200", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
+    <tr className={cn("border-b border-slate-200 h-[54px] bg-slate-50", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
       <th className="p-3 w-10 align-middle">
         <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
       </th>
-      <th className="p-3 text-xs font-medium text-slate-500">
+      <th className="p-3 text-xs font-medium text-slate-500 align-middle">
         <div className="flex items-center justify-between">
           <span>{t('date')}</span>
           <span>{t('title')}</span>
@@ -153,16 +160,18 @@ const NoTransactionsRow: React.FC<{
   const { t } = useI18n();
   
   let emptyMessage = t('noTransactions');
-  let icon = null;
 
   if (selectedCategory === 'uncategorized') {
-    emptyMessage = `${t('noTransactions')} - ${t('uncategorized')}`;
-    icon = <span className="text-2xl mb-2 block">❓</span>;
+    emptyMessage = `${t('noTransactionsInCategory')} ❓ ${t('uncategorized')}`;
   } else if (selectedCategory !== 'all') {
     const cat = categories.find(c => c.id === selectedCategory);
     if (cat) {
-      emptyMessage = `${t('noTransactions')} - ${cat.name}`;
-      icon = <span className="text-2xl mb-2 block">{cat.emoji || '❓'}</span>;
+      if (cat.parentId) {
+        const parentCat = categories.find(c => c.id === cat.parentId);
+        emptyMessage = `${t('noTransactionsInCategory')} ${parentCat?.emoji || '❓'} ${parentCat?.name} (${cat.name})`;
+      } else {
+        emptyMessage = `${t('noTransactionsInCategory')} ${cat.emoji || '❓'} ${cat.name}`;
+      }
     }
   }
 
@@ -171,7 +180,6 @@ const NoTransactionsRow: React.FC<{
       <tr>
         <td colSpan={5} className="p-12 text-center text-slate-500">
           <div className="flex flex-col items-center justify-center">
-            {icon}
             <span>{emptyMessage}</span>
           </div>
         </td>
@@ -448,10 +456,10 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-      <div className="overflow-x-auto md:overflow-visible">
-        <table className="w-full text-left text-sm">
-          <thead className={cn("border-b border-slate-200 text-slate-500 font-medium", selectedTransactions.size > 0 ? "bg-indigo-50/50" : "bg-slate-50/80")}>
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full">
+      <div className="overflow-x-auto md:overflow-visible flex-1 overflow-y-auto">
+        <table className="w-full text-left text-sm relative">
+          <thead className={cn("sticky top-0 z-10 border-b border-slate-200 text-slate-500 font-medium", selectedTransactions.size > 0 ? "bg-indigo-50" : "bg-slate-50")}>
             <DesktopTableHeader
               isChecked={isAllSelected}
               isDisabled={isNoneAvailable}
