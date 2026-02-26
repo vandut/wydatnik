@@ -72,7 +72,7 @@ const ImportModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               setAlertMessage(null);
               if (alertMessage.type === 'success') onClose();
             }}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors"
+            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors cursor-pointer"
           >
             OK
           </button>
@@ -107,7 +107,7 @@ const ImportModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <select 
             value={format} 
             onChange={(e) => setFormat(e.target.value)}
-            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer"
           >
             <option value="mbank">{t('mBankCSV')}</option>
           </select>

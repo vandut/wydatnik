@@ -125,8 +125,8 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
       <button
         onClick={() => handleSelect(null)}
         className={cn(
-          "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2",
-          categoryId === null ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"
+          "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
+          categoryId === null ? "text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"
         )}
       >
         <span className="w-6 text-center text-base">❓</span>
@@ -138,7 +138,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
           <button
             onClick={() => handleSelect(main.id)}
             className={cn(
-              "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2",
+              "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
               categoryId === main.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50 font-medium"
             )}
           >
@@ -161,7 +161,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
                 <button
                   onClick={() => handleSelect(sub.id)}
                   className={cn(
-                    "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors",
+                    "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors cursor-pointer",
                     categoryId === sub.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
                   )}
                 >
@@ -182,10 +182,13 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full bg-white border py-1.5 px-2 flex items-center gap-2 text-left focus:outline-none",
-          isOpen ? "border-indigo-500" : "border-slate-200 hover:border-slate-300 rounded-xl",
-          isOpen && position === 'bottom' && "rounded-t-xl rounded-b-none border-b-transparent",
-          isOpen && position === 'top' && "rounded-b-xl rounded-t-none border-t-transparent"
+          "w-full bg-white border py-1.5 px-2 flex items-center gap-2 text-left focus:outline-none cursor-pointer",
+          isOpen ? "xl:border-indigo-500" : "border-slate-200 hover:border-slate-300 rounded-xl",
+          // Only remove border radius on desktop (xl) when dropdown is open
+          isOpen && position === 'bottom' && "xl:rounded-t-xl xl:rounded-b-none xl:border-b-transparent rounded-xl",
+          isOpen && position === 'top' && "xl:rounded-b-xl xl:rounded-t-none xl:border-t-transparent rounded-xl",
+          // Keep normal border on mobile/tablet when open
+          isOpen && "border-slate-200 xl:border-indigo-500"
         )}
       >
         <div className="w-6 flex items-center justify-center text-lg shrink-0">
@@ -211,7 +214,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
         <div
           ref={dropdownRef}
           className={cn(
-            "hidden lg:block bg-white border border-indigo-500 shadow-lg overflow-y-auto",
+            "hidden xl:block bg-white border border-indigo-500 shadow-lg overflow-y-auto",
             position === 'bottom' ? "rounded-b-xl rounded-t-none border-t-0" : "rounded-t-xl rounded-b-none border-b-0"
           )}
           style={dropdownStyle}
@@ -225,14 +228,14 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
 
       {/* Mobile Modal */}
       {isOpen && createPortal(
-        <div className="lg:hidden fixed inset-0 z-[60] flex flex-col bg-black/50 animate-in fade-in duration-200 md:items-center md:justify-end md:p-4">
+        <div className="xl:hidden fixed inset-0 z-[60] flex flex-col bg-black/50 animate-in fade-in duration-200 items-center justify-end md:p-4 md:pb-0">
           <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
-          <div ref={mobileDropdownRef} className="bg-white rounded-t-2xl md:rounded-2xl flex flex-col max-h-[80vh] w-full md:max-w-sm animate-in slide-in-from-bottom-8 duration-200">
+          <div ref={mobileDropdownRef} className="bg-white rounded-t-2xl md:rounded-b-none flex flex-col max-h-[80vh] w-full md:max-w-md animate-in slide-in-from-bottom-8 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
               <h2 className="text-lg font-semibold text-slate-800">{t('selectCategory')}</h2>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors"
+                className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

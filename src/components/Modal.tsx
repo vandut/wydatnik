@@ -16,7 +16,7 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, children, footer }) => {
           <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
           <button 
             onClick={onClose} 
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

@@ -58,14 +58,14 @@ const DesktopSidebar: React.FC<{
       <div className="flex gap-2">
         <button 
           onClick={() => fileInputRef.current?.click()}
-          className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
+          className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
         >
           <FolderOpen className="w-3.5 h-3.5" />
           {t('load')}
         </button>
         <button 
           onClick={handleSave}
-          className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
+          className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
         >
           <Save className="w-3.5 h-3.5" />
           {t('save')}
@@ -98,7 +98,7 @@ const MobileHeader: React.FC<{
     <div className="flex items-center gap-2">
       <button 
         onClick={() => fileInputRef.current?.click()}
-        className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
+        className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium cursor-pointer"
         title={t('load')}
       >
         <FolderOpen className="w-5 h-5 md:w-4 md:h-4" />
@@ -106,7 +106,7 @@ const MobileHeader: React.FC<{
       </button>
       <button 
         onClick={handleSave}
-        className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
+        className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium cursor-pointer"
         title={t('save')}
       >
         <Save className="w-5 h-5 md:w-4 md:h-4" />
@@ -117,7 +117,7 @@ const MobileHeader: React.FC<{
           <div className="w-px h-6 bg-slate-200 mx-1 md:hidden"></div>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('toggleMobileCategories'))}
-            className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors md:hidden"
+            className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors md:hidden cursor-pointer"
             title={t('categories')}
           >
             <Menu className="w-5 h-5" />

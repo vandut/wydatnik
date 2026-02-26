@@ -23,7 +23,7 @@ const HeaderCheckbox: React.FC<{
       checked={isChecked}
       onChange={onChange}
       disabled={isDisabled}
-      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
     />
   </div>
 );
@@ -35,12 +35,13 @@ const DesktopTableHeader: React.FC<{
   selectedCount: number;
   onMerge: () => void;
   onDelete: () => void;
-}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onDelete }) => {
+  isTabletMinimized: boolean;
+}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onDelete, isTabletMinimized }) => {
   const { t } = useI18n();
   
   if (selectedCount > 0) {
     return (
-      <tr className="hidden sm:table-row bg-indigo-50/50">
+      <tr className={cn("bg-indigo-50/50 hidden", isTabletMinimized ? "sm:table-row" : "lg:table-row")}>
         <th className="p-4 w-12 align-middle">
           <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
         </th>
@@ -53,14 +54,14 @@ const DesktopTableHeader: React.FC<{
               <button
                 onClick={onMerge}
                 disabled={selectedCount < 2}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 <Merge className="w-4 h-4" />
                 {t('merge')}
               </button>
               <button
                 onClick={onDelete}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-rose-600 text-sm font-medium rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-rose-600 text-sm font-medium rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
                 {t('delete')}
@@ -73,7 +74,7 @@ const DesktopTableHeader: React.FC<{
   }
 
   return (
-    <tr className="hidden sm:table-row">
+    <tr className={cn("hidden", isTabletMinimized ? "sm:table-row" : "lg:table-row")}>
       <th className="p-4 w-12 align-middle">
         <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
       </th>
@@ -92,12 +93,13 @@ const MobileTableHeader: React.FC<{
   selectedCount: number;
   onMerge: () => void;
   onDelete: () => void;
-}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onDelete }) => {
+  isTabletMinimized: boolean;
+}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onDelete, isTabletMinimized }) => {
   const { t } = useI18n();
   
   if (selectedCount > 0) {
     return (
-      <tr className="sm:hidden border-b border-slate-200 bg-indigo-50/50">
+      <tr className={cn("border-b border-slate-200 bg-indigo-50/50", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
         <th className="p-3 w-10 align-middle">
           <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
         </th>
@@ -110,13 +112,13 @@ const MobileTableHeader: React.FC<{
               <button
                 onClick={onMerge}
                 disabled={selectedCount < 2}
-                className="p-1.5 bg-white text-indigo-700 rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 bg-white text-indigo-700 rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 <Merge className="w-4 h-4" />
               </button>
               <button
                 onClick={onDelete}
-                className="p-1.5 bg-white text-rose-600 rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors"
+                className="p-1.5 bg-white text-rose-600 rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -128,7 +130,7 @@ const MobileTableHeader: React.FC<{
   }
 
   return (
-    <tr className="sm:hidden border-b border-slate-200">
+    <tr className={cn("border-b border-slate-200", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
       <th className="p-3 w-10 align-middle">
         <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
       </th>
@@ -209,7 +211,7 @@ const TransactionRowFull: React.FC<{
             type="checkbox"
             checked={isSelected}
             onChange={onSelect}
-            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
           />
         </div>
       </td>
@@ -260,14 +262,14 @@ const TransactionRowMid: React.FC<{
 }) => {
   return (
     <>
-      <tr className={cn("hidden sm:table-row", isTabletMinimized ? "lg:hidden" : "xl:hidden")}>
+      <tr className={cn("hidden", isTabletMinimized ? "sm:table-row lg:hidden" : "lg:table-row xl:hidden")}>
         <td rowSpan={2} className="p-4 w-12 align-top">
           <div className="flex items-center h-full mt-0.5">
             <input
               type="checkbox"
               checked={isSelected}
               onChange={onSelect}
-              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
             />
           </div>
         </td>
@@ -281,7 +283,7 @@ const TransactionRowMid: React.FC<{
           {formatCurrency(transaction.amount)}
         </td>
       </tr>
-      <tr className={cn("hidden sm:table-row", isTabletMinimized ? "lg:hidden" : "xl:hidden")}>
+      <tr className={cn("hidden", isTabletMinimized ? "sm:table-row lg:hidden" : "lg:table-row xl:hidden")}>
         <td className="px-4 pb-4 pt-0"></td>
         <td className="px-4 pb-4 pt-0"></td>
         <td colSpan={2} className="px-4 pb-4 pt-0">
@@ -306,6 +308,7 @@ const TransactionRowSmall: React.FC<{
   onUpdateCategory: (transactionId: string, categoryId: string | null) => void;
   formatCurrency: (amount: number) => string;
   getCategoryEmoji: (id: string | null) => string;
+  isTabletMinimized: boolean;
   openDropdownId: string | null;
   setOpenDropdownId: (id: string | null) => void;
 }> = ({
@@ -316,19 +319,20 @@ const TransactionRowSmall: React.FC<{
   onUpdateCategory,
   formatCurrency,
   getCategoryEmoji,
+  isTabletMinimized,
   openDropdownId,
   setOpenDropdownId,
 }) => {
   return (
     <>
-      <tr className="sm:hidden">
+      <tr className={cn(isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
         <td rowSpan={3} className="p-3 w-10 align-top">
           <div className="flex items-start pt-1">
             <input
               type="checkbox"
               checked={isSelected}
               onChange={onSelect}
-              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
             />
           </div>
         </td>
@@ -343,12 +347,12 @@ const TransactionRowSmall: React.FC<{
           </div>
         </td>
       </tr>
-      <tr className="sm:hidden">
+      <tr className={cn(isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
         <td className="px-3 py-1 text-xs text-slate-500">
           {format(parseISO(transaction.date), 'dd.MM.yyyy')}
         </td>
       </tr>
-      <tr className="sm:hidden">
+      <tr className={cn(isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
         <td className="px-3 pt-1 pb-3">
           <CategoryDropdown
             categoryId={transaction.categoryId}
@@ -455,6 +459,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               selectedCount={selectedTransactions.size}
               onMerge={handleMergeSelected}
               onDelete={() => setIsConfirmingDelete(true)}
+              isTabletMinimized={isTabletMinimized}
             />
             <MobileTableHeader
               isChecked={isAllSelected}
@@ -463,6 +468,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               selectedCount={selectedTransactions.size}
               onMerge={handleMergeSelected}
               onDelete={() => setIsConfirmingDelete(true)}
+              isTabletMinimized={isTabletMinimized}
             />
           </thead>
           {isNoneAvailable ? (
@@ -507,6 +513,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   onUpdateCategory={onUpdateCategory}
                   formatCurrency={formatCurrency}
                   getCategoryEmoji={getCategoryEmoji}
+                  isTabletMinimized={isTabletMinimized}
                   openDropdownId={openDropdownId}
                   setOpenDropdownId={setOpenDropdownId}
                 />
@@ -524,13 +531,13 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
             <>
               <button
                 onClick={() => setIsConfirmingDelete(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={handleDeleteSelected}
-                className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors cursor-pointer"
               >
                 {t('delete')}
               </button>

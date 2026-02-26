@@ -22,7 +22,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
           <h2 className="font-semibold text-slate-800">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
           >
             <Menu className="w-5 h-5" />
           </button>

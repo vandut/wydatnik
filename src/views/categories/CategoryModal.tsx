@@ -43,14 +43,14 @@ const CategoryModal: React.FC<{
         <>
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
           >
             {t('saveChanges')}
           </button>
@@ -74,7 +74,7 @@ const CategoryModal: React.FC<{
           <select
             value={parentId || ''}
             onChange={(e) => setParentId(e.target.value || null)}
-            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer"
           >
             <option value="">{t('none')}</option>
             {mainCategories.map(c => (

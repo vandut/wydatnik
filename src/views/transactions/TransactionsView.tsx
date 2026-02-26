@@ -35,13 +35,13 @@ const DateNavigation: React.FC<{
 
   return (
     <div className="flex items-center gap-2">
-      <button onClick={() => setCurrentDate(new Date())} className="mr-2 px-3 py-1.5 text-sm font-medium text-slate-600 bg-slate-200/50 hover:bg-slate-200 rounded-lg transition-colors">
+      <button onClick={() => setCurrentDate(new Date())} className="mr-2 px-3 py-1.5 text-sm font-medium text-slate-600 bg-slate-200/50 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
         {t('today')}
       </button>
-      <button onClick={() => setCurrentDate(subMonths(currentDate, 1))} className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors">
+      <button onClick={() => setCurrentDate(subMonths(currentDate, 1))} className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer">
         <ChevronLeft className="w-5 h-5" />
       </button>
-      <button onClick={() => setCurrentDate(addMonths(currentDate, 1))} className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors">
+      <button onClick={() => setCurrentDate(addMonths(currentDate, 1))} className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer">
         <ChevronRight className="w-5 h-5" />
       </button>
       <span className="text-lg font-medium text-slate-800 capitalize min-w-[140px] text-center">
@@ -73,7 +73,7 @@ const TransactionsHeader: React.FC<{
       <button
         onClick={onImportClick}
         className={cn(
-          "order-2 flex items-center gap-2 px-3 md:px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm",
+          "order-2 flex items-center gap-2 px-3 md:px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer",
           isTabletMinimized ? "md:order-3" : "lg:order-3"
         )}
       >
@@ -223,7 +223,7 @@ const TransactionsView: React.FC = () => {
       {/* Left Sidebar - Categories Filter (Desktop & Tablet) */}
       <div className={cn(
         "hidden md:flex bg-white border-r border-slate-200 flex-col flex-shrink-0 overflow-y-auto",
-        isTabletMinimized ? "w-16 xl:w-64" : "w-64"
+        isTabletMinimized ? "w-16 xl:w-72" : "w-72"
       )}>
         <TransactionCategories
           selectedCategory={selectedCategory}

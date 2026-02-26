@@ -31,7 +31,12 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
 
   // Build category tree for dropdown
   const mainCategories = state.categories.filter(c => !c.parentId);
-  const totalAmount = Object.values(categorySummary).reduce((sum: number, val: number) => sum + val, 0) as number;
+  
+  // Calculate total amount correctly by only summing main categories and uncategorized
+  const totalAmount = Object.entries(categorySummary).reduce((sum, [id, val]) => {
+    const isMainOrUncategorized = id === 'uncategorized' || state.categories.find(c => c.id === id && !c.parentId);
+    return isMainOrUncategorized ? sum + val : sum;
+  }, 0);
 
   // If minimized, switch to main category if a subcategory is selected
   useEffect(() => {
@@ -62,40 +67,48 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
     isSelected: boolean,
     hasChildren: boolean = false,
     isExpanded: boolean = false,
-    onExpandToggle?: (e: React.MouseEvent) => void
+    onExpandToggle?: (e: React.MouseEvent) => void,
+    isSubcategory: boolean = false
   ) => {
     return (
-      <button
-        key={id}
-        onClick={() => setSelectedCategory(id)}
-        className={cn(
-          "w-full flex items-center px-3 py-2 rounded-xl text-sm transition-colors cursor-pointer",
-          isMinimized ? "justify-center xl:justify-between" : "justify-between",
-          isSelected ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
-        )}
-        title={isMinimized ? name : undefined}
-      >
-        <div className="flex items-center gap-2 truncate">
-          <span className="w-6 text-center text-base shrink-0">{emoji}</span>
-          <span className={cn("truncate", isMinimized ? "hidden xl:inline" : "")}>{name}</span>
-        </div>
-        <div className={cn("flex items-center gap-1", isMinimized ? "hidden xl:flex" : "")}>
-          <span className={cn("text-xs", 
-            amount > 0 ? "text-emerald-600" : 
-            amount < 0 ? "text-rose-600" : "text-slate-400"
-          )}>
-            {formatCurrency(amount)}
-          </span>
-          {hasChildren && onExpandToggle && (
-            <div 
-              onClick={onExpandToggle}
-              className="p-1 rounded hover:bg-slate-200/50 transition-colors ml-1"
-            >
-              {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-            </div>
+      <div key={id} className="flex items-center w-full gap-0.5">
+        <button
+          onClick={() => setSelectedCategory(id)}
+          className={cn(
+            "flex-1 flex items-center pl-3 pr-2 py-2 rounded-xl text-sm transition-colors cursor-pointer min-w-0",
+            isMinimized ? "justify-center xl:justify-between" : "justify-between",
+            isSelected ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50",
+            isSubcategory && "py-1.5 text-xs"
           )}
+          title={isMinimized ? name : undefined}
+        >
+          <div className="flex items-center gap-2 truncate">
+            {!isSubcategory && <span className="w-6 text-center text-base shrink-0">{emoji}</span>}
+            <span className={cn("truncate", isMinimized && !isSubcategory ? "hidden xl:inline" : "")}>{name}</span>
+          </div>
+          <div className={cn("flex items-center gap-1 shrink-0", isMinimized && !isSubcategory ? "hidden xl:flex" : "")}>
+            <span className={cn("text-xs", 
+              amount > 0 ? "text-emerald-600" : 
+              amount < 0 ? "text-rose-600" : "text-slate-400"
+            )}>
+              {formatCurrency(amount)}
+            </span>
+          </div>
+        </button>
+        
+        {/* Chevron outside the button */}
+        <div className={cn("flex items-center justify-center shrink-0 pr-1", isMinimized && !isSubcategory ? "hidden xl:flex" : "")}>
+          <div 
+            onClick={hasChildren && onExpandToggle ? onExpandToggle : undefined}
+            className={cn(
+              "p-0.5 transition-colors",
+              hasChildren ? "cursor-pointer text-slate-500 hover:text-slate-800" : "opacity-30 cursor-default text-slate-400"
+            )}
+          >
+            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
         </div>
-      </button>
+      </div>
     );
   };
 
@@ -165,21 +178,17 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
                     <div key={sub.id} className="relative flex items-center pl-[44px] pr-0 py-0.5">
                       <div className="absolute left-[24px] top-1/2 w-4 h-px bg-slate-200" />
                       
-                      <button
-                        onClick={() => setSelectedCategory(sub.id)}
-                        className={cn(
-                          "w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs transition-colors cursor-pointer",
-                          selectedCategory === sub.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
-                        )}
-                      >
-                        <span className="truncate">{sub.name}</span>
-                        <span className={cn(
-                          (categorySummary[sub.id] || 0) > 0 ? "text-emerald-600" : 
-                          (categorySummary[sub.id] || 0) < 0 ? "text-rose-600" : "text-slate-400"
-                        )}>
-                          {formatCurrency(categorySummary[sub.id] || 0)}
-                        </span>
-                      </button>
+                      {renderCategoryButton(
+                        sub.id,
+                        sub.name,
+                        '',
+                        categorySummary[sub.id] || 0,
+                        selectedCategory === sub.id,
+                        false, // Subcategories don't have children in this structure
+                        false,
+                        undefined,
+                        true // isSubcategory
+                      )}
                     </div>
                   ))}
                 </div>

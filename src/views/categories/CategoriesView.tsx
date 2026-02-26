@@ -42,7 +42,7 @@ const CategoriesView: React.FC = () => {
         <h1 className="text-2xl font-bold text-slate-900">{t('categories')}</h1>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           {t('addCategory')}
@@ -59,10 +59,10 @@ const CategoriesView: React.FC = () => {
                   <span className="font-medium text-slate-800">{main.name}</span>
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => openEdit(main)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50">
+                  <button onClick={() => openEdit(main)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleDelete(main.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50">
+                  <button onClick={() => handleDelete(main.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -77,10 +77,10 @@ const CategoriesView: React.FC = () => {
                       <span className="text-sm text-slate-600">{sub.name}</span>
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover/sub:opacity-100 transition-opacity">
-                      <button onClick={() => openEdit(sub)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50">
+                      <button onClick={() => openEdit(sub)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => handleDelete(sub.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50">
+                      <button onClick={() => handleDelete(sub.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -107,13 +107,13 @@ const CategoriesView: React.FC = () => {
             <>
               <button
                 onClick={() => setCategoryToDelete(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors cursor-pointer"
               >
                 {t('delete')}
               </button>
