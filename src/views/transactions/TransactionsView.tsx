@@ -18,10 +18,10 @@ const BalancesSummary: React.FC<{
 }> = ({ balances, formatCurrency }) => {
   const { t } = useI18n();
   return (
-    <div className="flex items-center gap-4 text-sm">
-      <span className="text-emerald-600 font-medium">↗ {formatCurrency(balances.income)}</span>
-      <span className="text-rose-600 font-medium">↘ {formatCurrency(balances.expenses)}</span>
-      <span className="text-slate-500 ml-2">{t('total')}: {formatCurrency(balances.total)}</span>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+      <span className="text-emerald-600 font-medium whitespace-nowrap">↗ {formatCurrency(balances.income)}</span>
+      <span className="text-rose-600 font-medium whitespace-nowrap">↘ {formatCurrency(balances.expenses)}</span>
+      <span className="text-slate-500 md:ml-2 whitespace-nowrap">{t('total')}: {formatCurrency(balances.total)}</span>
     </div>
   );
 };
@@ -237,8 +237,8 @@ const TransactionsView: React.FC = () => {
       </div>
 
       {/* Main Content - Transactions List */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/50 h-full overflow-hidden">
-        <div className="p-4 md:p-6 space-y-4 md:space-y-6 w-full h-full flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/50 overflow-y-auto">
+        <div className="p-4 md:p-6 space-y-4 md:space-y-6 w-full">
           <DateNavigation
             currentDate={currentDate}
             setCurrentDate={setCurrentDate}
@@ -251,22 +251,20 @@ const TransactionsView: React.FC = () => {
             isTabletMinimized={isTabletMinimized}
           />
 
-          {/* Table Container */}
-          <div className="flex-1 min-h-0">
-            <TransactionsTable
-              filteredTransactions={filteredTransactions}
-              categories={state.categories}
-              selectedTransactions={selectedTransactions}
-              setSelectedTransactions={setSelectedTransactions}
-              handleSelectAll={handleSelectAll}
-              handleSelect={handleSelect}
-              onUpdateCategory={handleUpdateCategory}
-              formatCurrency={formatCurrency}
-              getCategoryEmoji={getCategoryEmoji}
-              isTabletMinimized={isTabletMinimized}
-              selectedCategory={selectedCategory}
-            />
-          </div>
+          {/* Table */}
+          <TransactionsTable
+            filteredTransactions={filteredTransactions}
+            categories={state.categories}
+            selectedTransactions={selectedTransactions}
+            setSelectedTransactions={setSelectedTransactions}
+            handleSelectAll={handleSelectAll}
+            handleSelect={handleSelect}
+            onUpdateCategory={handleUpdateCategory}
+            formatCurrency={formatCurrency}
+            getCategoryEmoji={getCategoryEmoji}
+            isTabletMinimized={isTabletMinimized}
+            selectedCategory={selectedCategory}
+          />
         </div>
       </div>
       {isImportModalOpen && <ImportModal onClose={() => setIsImportModalOpen(false)} />}

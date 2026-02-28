@@ -41,7 +41,7 @@ const DesktopTableHeader: React.FC<{
   
   return (
     <>
-      <tr className={cn("hidden h-[66px]", isTabletMinimized ? "sm:table-row" : "lg:table-row", selectedCount > 0 ? "bg-indigo-50" : "bg-slate-50")}>
+      <tr className={cn("hidden h-[66px]", isTabletMinimized ? "sm:table-row" : "lg:table-row", selectedCount > 0 ? "bg-indigo-50/50" : "")}>
         <th className="p-4 w-12 align-middle">
           <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
         </th>
@@ -106,7 +106,7 @@ const MobileTableHeader: React.FC<{
   
   if (selectedCount > 0) {
     return (
-      <tr className={cn("border-b border-slate-200 bg-indigo-50 h-[54px]", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
+      <tr className={cn("border-b border-slate-200 bg-indigo-50/50 h-[54px]", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
         <th className="p-3 w-10 align-middle">
           <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
         </th>
@@ -137,7 +137,7 @@ const MobileTableHeader: React.FC<{
   }
 
   return (
-    <tr className={cn("border-b border-slate-200 h-[54px] bg-slate-50", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
+    <tr className={cn("border-b border-slate-200 h-[54px]", isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
       <th className="p-3 w-10 align-middle">
         <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
       </th>
@@ -344,9 +344,9 @@ const TransactionRowSmall: React.FC<{
             />
           </div>
         </td>
-        <td className="pt-3 px-3 pb-1">
+        <td className="pt-3 px-3 pb-1 max-w-0">
           <div className="flex justify-between items-start gap-2">
-            <span className="font-medium text-slate-800 truncate" title={transaction.description}>
+            <span className="font-medium text-slate-800 truncate flex-1" title={transaction.description}>
               {transaction.description}
             </span>
             <span className={cn("font-medium whitespace-nowrap shrink-0", transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
@@ -456,10 +456,10 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full">
-      <div className="overflow-x-auto md:overflow-visible flex-1 overflow-y-auto">
-        <table className="w-full text-left text-sm relative">
-          <thead className={cn("sticky top-0 z-10 border-b border-slate-200 text-slate-500 font-medium", selectedTransactions.size > 0 ? "bg-indigo-50" : "bg-slate-50")}>
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="overflow-x-auto md:overflow-visible">
+        <table className="w-full text-left text-sm">
+          <thead className={cn("border-b border-slate-200 text-slate-500 font-medium", selectedTransactions.size > 0 ? "bg-indigo-50/50" : "bg-slate-50/80")}>
             <DesktopTableHeader
               isChecked={isAllSelected}
               isDisabled={isNoneAvailable}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useI18n } from '../../i18n/I18nContext';
 import { useAppContext } from '../../store/AppContext';
 import { cn } from '../../lib/utils';
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
 
 interface TransactionCategoriesProps {
   selectedCategory: string;
@@ -38,6 +38,22 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
     return isMainOrUncategorized ? sum + val : sum;
   }, 0);
 
+  const categoriesWithSubcategories = mainCategories.filter(cat => 
+    state.categories.some(c => c.parentId === cat.id)
+  );
+  
+  const areAllExpanded = categoriesWithSubcategories.length > 0 && 
+    categoriesWithSubcategories.every(cat => expandedCategories.has(cat.id));
+
+  const toggleAll = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (areAllExpanded) {
+      setExpandedCategories(new Set());
+    } else {
+      setExpandedCategories(new Set(categoriesWithSubcategories.map(c => c.id)));
+    }
+  };
+
   // If minimized, switch to main category if a subcategory is selected
   useEffect(() => {
     if (isMinimized && selectedCategory !== 'all' && selectedCategory !== 'uncategorized') {
@@ -68,7 +84,9 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
     hasChildren: boolean = false,
     isExpanded: boolean = false,
     onExpandToggle?: (e: React.MouseEvent) => void,
-    isSubcategory: boolean = false
+    isSubcategory: boolean = false,
+    customChevron?: React.ReactNode,
+    hideChevron?: boolean
   ) => {
     return (
       <div key={id} className="flex items-center w-full gap-0.5">
@@ -98,15 +116,21 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
         
         {/* Chevron outside the button */}
         <div className={cn("flex items-center justify-center shrink-0 pr-1", isMinimized && !isSubcategory ? "hidden xl:flex" : "")}>
-          <div 
-            onClick={hasChildren && onExpandToggle ? onExpandToggle : undefined}
-            className={cn(
-              "p-0.5 transition-colors",
-              hasChildren ? "cursor-pointer text-slate-500 hover:text-slate-800" : "opacity-30 cursor-default text-slate-400"
-            )}
-          >
-            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </div>
+          {hideChevron ? (
+            <div className="w-5 h-5" />
+          ) : customChevron ? (
+            customChevron
+          ) : (
+            <div 
+              onClick={hasChildren && onExpandToggle ? onExpandToggle : undefined}
+              className={cn(
+                "p-0.5 transition-colors",
+                hasChildren ? "cursor-pointer text-slate-500 hover:text-slate-800" : "opacity-30 cursor-default text-slate-400"
+              )}
+            >
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -134,7 +158,18 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
           t('all'),
           '⚪',
           totalAmount,
-          selectedCategory === 'all'
+          selectedCategory === 'all',
+          false,
+          false,
+          undefined,
+          false,
+          <div 
+            onClick={toggleAll}
+            className="p-0.5 transition-colors cursor-pointer text-slate-500 hover:text-slate-800"
+            title={areAllExpanded ? "Collapse all" : "Expand all"}
+          >
+            {areAllExpanded ? <ChevronsDownUp className="w-4 h-4" /> : <ChevronsUpDown className="w-4 h-4" />}
+          </div>
         )}
         
         {/* Uncategorized (No category) */}
@@ -143,7 +178,13 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
           t('uncategorized'),
           '❓',
           categorySummary['uncategorized'] || 0,
-          selectedCategory === 'uncategorized'
+          selectedCategory === 'uncategorized',
+          false,
+          false,
+          undefined,
+          false,
+          undefined,
+          true
         )}
         
         {/* Main Categories */}
