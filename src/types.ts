@@ -11,6 +11,7 @@ export type Category = {
   name: string;
   parentId: string | null;
   emoji?: string; // Only for parent categories
+  isNotExpense?: boolean;
 };
 
 export type AppState = {

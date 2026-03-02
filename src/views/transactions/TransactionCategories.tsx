@@ -8,7 +8,8 @@ interface TransactionCategoriesProps {
   selectedCategory: string;
   setSelectedCategory: (id: string) => void;
   categorySummary: Record<string, number>;
-  formatCurrency: (amount: number) => string;
+  totalBalance: number;
+  formatCurrency: (amount: number, forceNoSign?: boolean) => string;
   hideHeader?: boolean;
   isMinimized?: boolean;
   onToggleMinimize?: () => void;
@@ -19,6 +20,7 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
   selectedCategory,
   setSelectedCategory,
   categorySummary,
+  totalBalance,
   formatCurrency,
   hideHeader = false,
   isMinimized = false,
@@ -31,12 +33,6 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
 
   // Build category tree for dropdown
   const mainCategories = state.categories.filter(c => !c.parentId);
-  
-  // Calculate total amount correctly by only summing main categories and uncategorized
-  const totalAmount = Object.entries(categorySummary).reduce((sum, [id, val]) => {
-    const isMainOrUncategorized = id === 'uncategorized' || state.categories.find(c => c.id === id && !c.parentId);
-    return isMainOrUncategorized ? sum + val : sum;
-  }, 0);
 
   const categoriesWithSubcategories = mainCategories.filter(cat => 
     state.categories.some(c => c.parentId === cat.id)
@@ -86,7 +82,8 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
     onExpandToggle?: (e: React.MouseEvent) => void,
     isSubcategory: boolean = false,
     customChevron?: React.ReactNode,
-    hideChevron?: boolean
+    hideChevron?: boolean,
+    isNotExpense?: boolean
   ) => {
     return (
       <div key={id} className="flex items-center w-full gap-0.5">
@@ -106,10 +103,11 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
           </div>
           <div className={cn("flex items-center gap-1 shrink-0", isMinimized && !isSubcategory ? "hidden xl:flex" : "")}>
             <span className={cn("text-xs", 
+              isNotExpense ? "text-slate-600" :
               amount > 0 ? "text-emerald-600" : 
               amount < 0 ? "text-rose-600" : "text-slate-400"
             )}>
-              {formatCurrency(amount)}
+              {isNotExpense ? formatCurrency(Math.abs(amount), true) : formatCurrency(amount)}
             </span>
           </div>
         </button>
@@ -157,7 +155,7 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
           'all',
           t('all'),
           '⚪',
-          totalAmount,
+          totalBalance,
           selectedCategory === 'all',
           false,
           false,
@@ -193,6 +191,7 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
           const hasChildren = subcategories.length > 0;
           const isExpanded = expandedCategories.has(cat.id);
           const isSelected = selectedCategory === cat.id;
+          const isCatNotExpense = cat.isNotExpense;
           
           return (
             <div key={cat.id} className="space-y-1">
@@ -204,7 +203,11 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
                 isSelected,
                 hasChildren,
                 isExpanded,
-                hasChildren ? (e) => toggleExpand(e, cat.id) : undefined
+                hasChildren ? (e) => toggleExpand(e, cat.id) : undefined,
+                false,
+                undefined,
+                false,
+                isCatNotExpense
               )}
               
               {/* Subcategories Tree */}
@@ -228,7 +231,10 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
                         false, // Subcategories don't have children in this structure
                         false,
                         undefined,
-                        true // isSubcategory
+                        true, // isSubcategory
+                        undefined,
+                        false,
+                        isCatNotExpense || sub.isNotExpense
                       )}
                     </div>
                   ))}

@@ -9,6 +9,8 @@ type Action =
   | { type: 'UPDATE_TRANSACTION_CATEGORY'; payload: { id: string; categoryId: string | null } }
   | { type: 'DELETE_TRANSACTIONS'; payload: string[] }
   | { type: 'MERGE_TRANSACTIONS'; payload: { ids: string[]; mergedTransaction: Transaction } }
+  | { type: 'UPDATE_TRANSACTION'; payload: Transaction }
+  | { type: 'SPLIT_TRANSACTION'; payload: { id: string; newTransactions: Transaction[] } }
   | { type: 'ADD_CATEGORY'; payload: Category }
   | { type: 'UPDATE_CATEGORY'; payload: Category }
   | { type: 'DELETE_CATEGORY'; payload: string };
@@ -39,6 +41,21 @@ const appReducer = (state: AppState, action: Action): AppState => {
         transactions: [
           ...state.transactions.filter((t) => !action.payload.ids.includes(t.id)),
           action.payload.mergedTransaction,
+        ],
+      };
+    case 'UPDATE_TRANSACTION':
+      return {
+        ...state,
+        transactions: state.transactions.map((t) =>
+          t.id === action.payload.id ? action.payload : t
+        ),
+      };
+    case 'SPLIT_TRANSACTION':
+      return {
+        ...state,
+        transactions: [
+          ...state.transactions.filter((t) => t.id !== action.payload.id),
+          ...action.payload.newTransactions,
         ],
       };
     case 'ADD_CATEGORY':

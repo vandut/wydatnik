@@ -56,6 +56,13 @@ export const dictionaries = {
     today: 'Today',
     importedCount: 'Imported transactions',
     dateRange: 'Date range',
+    excludeFromExpenses: 'Exclude from expenses',
+    noSubcategories: 'No subcategories',
+    edit: 'Edit',
+    split: 'Split',
+    from: 'From',
+    to: 'To',
+    invalidDateRange: 'Invalid date range',
   },
   pl: {
     accounts: 'Rachunki',
@@ -114,6 +121,13 @@ export const dictionaries = {
     today: 'Dzisiaj',
     importedCount: 'Zaimportowane transakcje',
     dateRange: 'Zakres dat',
+    excludeFromExpenses: 'Nie wliczaj do wydatków',
+    noSubcategories: 'Brak podkategorii',
+    edit: 'Edytuj',
+    split: 'Podziel',
+    from: 'Od',
+    to: 'Do',
+    invalidDateRange: 'Nieprawidłowy zakres dat',
   },
 };
 

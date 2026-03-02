@@ -6,9 +6,11 @@ import { cn } from '../../lib/utils';
 import { Category } from '../../types';
 import { Transaction } from '../../store/AppContext';
 import CategoryDropdown from './CategoryDropdown';
-import { Trash2, Merge } from 'lucide-react';
+import { Trash2, Merge, ChevronUp, ChevronDown, Pencil, Split } from 'lucide-react';
 import Modal from '../../components/Modal';
 import { v4 as uuidv4 } from 'uuid';
+import EditTransactionModal from './EditTransactionModal';
+import SplitTransactionModal from './SplitTransactionModal';
 
 // --- INNER COMPONENTS ---
 
@@ -34,11 +36,34 @@ const DesktopTableHeader: React.FC<{
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   selectedCount: number;
   onMerge: () => void;
+  onEdit: () => void;
+  onSplit: () => void;
   onDelete: () => void;
   isTabletMinimized: boolean;
-}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onDelete, isTabletMinimized }) => {
+  sortColumn: 'date' | 'title' | 'category' | 'amount';
+  sortDirection: 'asc' | 'desc';
+  onSort: (column: 'date' | 'title' | 'category' | 'amount') => void;
+}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onEdit, onSplit, onDelete, isTabletMinimized, sortColumn, sortDirection, onSort }) => {
   const { t } = useI18n();
   
+  const renderSortableHeader = (column: 'date' | 'title' | 'category' | 'amount', label: string, className: string) => {
+    const isActive = sortColumn === column;
+    return (
+      <th 
+        className={cn("p-4 align-middle cursor-pointer hover:bg-slate-100/50 transition-colors select-none", className)}
+        onClick={() => onSort(column)}
+      >
+        <div className={cn("flex items-center gap-1", column === 'amount' ? "justify-end" : "")}>
+          {label}
+          <div className="flex flex-col">
+            <ChevronUp className={cn("w-3 h-3 -mb-1", isActive && sortDirection === 'asc' ? "text-indigo-600" : "text-slate-300")} />
+            <ChevronDown className={cn("w-3 h-3", isActive && sortDirection === 'desc' ? "text-indigo-600" : "text-slate-300")} />
+          </div>
+        </div>
+      </th>
+    );
+  };
+
   return (
     <>
       <tr className={cn("hidden h-[66px]", isTabletMinimized ? "sm:table-row" : "lg:table-row", selectedCount > 0 ? "bg-indigo-50/50" : "")}>
@@ -52,6 +77,22 @@ const DesktopTableHeader: React.FC<{
                 {selectedCount} {t('selected')}
               </span>
               <div className="flex items-center gap-2">
+                <button
+                  onClick={onEdit}
+                  disabled={selectedCount !== 1}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
+                  <Pencil className="w-4 h-4" />
+                  {t('edit')}
+                </button>
+                <button
+                  onClick={onSplit}
+                  disabled={selectedCount !== 1}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
+                  <Split className="w-4 h-4" />
+                  {t('split')}
+                </button>
                 <button
                   onClick={onMerge}
                   disabled={selectedCount < 2}
@@ -72,10 +113,10 @@ const DesktopTableHeader: React.FC<{
           </th>
         ) : (
           <>
-            <th className="p-4 w-32 align-middle">{t('date')}</th>
-            <th className="p-4 w-[40%] align-middle">{t('title')}</th>
-            <th className="p-4 w-64 align-middle">{t('category')}</th>
-            <th className="p-4 text-right align-middle">{t('amount')}</th>
+            {renderSortableHeader('date', t('date'), 'w-32')}
+            {renderSortableHeader('title', t('title'), 'w-[40%]')}
+            {renderSortableHeader('category', t('category'), 'w-64')}
+            {renderSortableHeader('amount', t('amount'), 'text-right')}
           </>
         )}
       </tr>
@@ -99,9 +140,14 @@ const MobileTableHeader: React.FC<{
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   selectedCount: number;
   onMerge: () => void;
+  onEdit: () => void;
+  onSplit: () => void;
   onDelete: () => void;
   isTabletMinimized: boolean;
-}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onDelete, isTabletMinimized }) => {
+  sortColumn: 'date' | 'title' | 'category' | 'amount';
+  sortDirection: 'asc' | 'desc';
+  onSort: (column: 'date' | 'title' | 'category' | 'amount') => void;
+}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onEdit, onSplit, onDelete, isTabletMinimized, sortColumn, sortDirection, onSort }) => {
   const { t } = useI18n();
   
   if (selectedCount > 0) {
@@ -116,6 +162,20 @@ const MobileTableHeader: React.FC<{
               {selectedCount} {t('selected')}
             </span>
             <div className="flex items-center gap-2">
+              <button
+                onClick={onEdit}
+                disabled={selectedCount !== 1}
+                className="p-1.5 bg-white text-indigo-700 rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
+                onClick={onSplit}
+                disabled={selectedCount !== 1}
+                className="p-1.5 bg-white text-indigo-700 rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                <Split className="w-4 h-4" />
+              </button>
               <button
                 onClick={onMerge}
                 disabled={selectedCount < 2}
@@ -142,11 +202,35 @@ const MobileTableHeader: React.FC<{
         <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
       </th>
       <th className="p-3 text-xs font-medium text-slate-500 align-middle">
-        <div className="flex items-center justify-between">
-          <span>{t('date')}</span>
-          <span>{t('title')}</span>
-          <span>{t('category')}</span>
-          <span>{t('amount')}</span>
+        <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 cursor-pointer select-none shrink-0" onClick={() => onSort('date')}>
+            <span>{t('date')}</span>
+            <div className="flex flex-col">
+              <ChevronUp className={cn("w-3 h-3 -mb-1", sortColumn === 'date' && sortDirection === 'asc' ? "text-indigo-600" : "text-slate-300")} />
+              <ChevronDown className={cn("w-3 h-3", sortColumn === 'date' && sortDirection === 'desc' ? "text-indigo-600" : "text-slate-300")} />
+            </div>
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer select-none shrink-0" onClick={() => onSort('title')}>
+            <span>{t('title')}</span>
+            <div className="flex flex-col">
+              <ChevronUp className={cn("w-3 h-3 -mb-1", sortColumn === 'title' && sortDirection === 'asc' ? "text-indigo-600" : "text-slate-300")} />
+              <ChevronDown className={cn("w-3 h-3", sortColumn === 'title' && sortDirection === 'desc' ? "text-indigo-600" : "text-slate-300")} />
+            </div>
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer select-none shrink-0" onClick={() => onSort('category')}>
+            <span>{t('category')}</span>
+            <div className="flex flex-col">
+              <ChevronUp className={cn("w-3 h-3 -mb-1", sortColumn === 'category' && sortDirection === 'asc' ? "text-indigo-600" : "text-slate-300")} />
+              <ChevronDown className={cn("w-3 h-3", sortColumn === 'category' && sortDirection === 'desc' ? "text-indigo-600" : "text-slate-300")} />
+            </div>
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer select-none shrink-0" onClick={() => onSort('amount')}>
+            <span>{t('amount')}</span>
+            <div className="flex flex-col">
+              <ChevronUp className={cn("w-3 h-3 -mb-1", sortColumn === 'amount' && sortDirection === 'asc' ? "text-indigo-600" : "text-slate-300")} />
+              <ChevronDown className={cn("w-3 h-3", sortColumn === 'amount' && sortDirection === 'desc' ? "text-indigo-600" : "text-slate-300")} />
+            </div>
+          </div>
         </div>
       </th>
     </tr>
@@ -194,7 +278,7 @@ const TransactionRowFull: React.FC<{
   onSelect: () => void;
   categories: Category[];
   onUpdateCategory: (transactionId: string, categoryId: string | null) => void;
-  formatCurrency: (amount: number) => string;
+  formatCurrency: (amount: number, forceNoSign?: boolean) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
   openDropdownId: string | null;
@@ -211,6 +295,9 @@ const TransactionRowFull: React.FC<{
   openDropdownId,
   setOpenDropdownId,
 }) => {
+  const cat = categories.find(c => c.id === transaction.categoryId);
+  const isNotExpense = cat?.isNotExpense || (cat?.parentId ? categories.find(c => c.id === cat.parentId)?.isNotExpense : false);
+
   return (
     <tr className={cn("hidden", isTabletMinimized ? "lg:table-row" : "xl:table-row")}>
       <td className="p-4 align-middle">
@@ -238,8 +325,8 @@ const TransactionRowFull: React.FC<{
           onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? transaction.id : null)}
         />
       </td>
-      <td className={cn("p-4 text-right font-medium whitespace-nowrap", transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
-        {formatCurrency(transaction.amount)}
+      <td className={cn("p-4 text-right font-medium whitespace-nowrap", isNotExpense ? "text-slate-800" : transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
+        {isNotExpense ? formatCurrency(Math.abs(transaction.amount), true) : formatCurrency(transaction.amount)}
       </td>
     </tr>
   );
@@ -251,7 +338,7 @@ const TransactionRowMid: React.FC<{
   onSelect: () => void;
   categories: Category[];
   onUpdateCategory: (transactionId: string, categoryId: string | null) => void;
-  formatCurrency: (amount: number) => string;
+  formatCurrency: (amount: number, forceNoSign?: boolean) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
   openDropdownId: string | null;
@@ -268,6 +355,9 @@ const TransactionRowMid: React.FC<{
   openDropdownId,
   setOpenDropdownId,
 }) => {
+  const cat = categories.find(c => c.id === transaction.categoryId);
+  const isNotExpense = cat?.isNotExpense || (cat?.parentId ? categories.find(c => c.id === cat.parentId)?.isNotExpense : false);
+
   return (
     <>
       <tr className={cn("hidden", isTabletMinimized ? "sm:table-row lg:hidden" : "lg:table-row xl:hidden")}>
@@ -287,8 +377,8 @@ const TransactionRowMid: React.FC<{
         <td colSpan={2} className="px-4 pt-4 pb-2 font-medium text-slate-800 truncate max-w-[200px] align-top" title={transaction.description}>
           {transaction.description}
         </td>
-        <td className={cn("px-4 pt-4 pb-2 text-right font-medium whitespace-nowrap align-top", transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
-          {formatCurrency(transaction.amount)}
+        <td className={cn("px-4 pt-4 pb-2 text-right font-medium whitespace-nowrap align-top", isNotExpense ? "text-slate-800" : transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
+          {isNotExpense ? formatCurrency(Math.abs(transaction.amount), true) : formatCurrency(transaction.amount)}
         </td>
       </tr>
       <tr className={cn("hidden", isTabletMinimized ? "sm:table-row lg:hidden" : "lg:table-row xl:hidden")}>
@@ -314,7 +404,7 @@ const TransactionRowSmall: React.FC<{
   onSelect: () => void;
   categories: Category[];
   onUpdateCategory: (transactionId: string, categoryId: string | null) => void;
-  formatCurrency: (amount: number) => string;
+  formatCurrency: (amount: number, forceNoSign?: boolean) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
   openDropdownId: string | null;
@@ -331,6 +421,9 @@ const TransactionRowSmall: React.FC<{
   openDropdownId,
   setOpenDropdownId,
 }) => {
+  const cat = categories.find(c => c.id === transaction.categoryId);
+  const isNotExpense = cat?.isNotExpense || (cat?.parentId ? categories.find(c => c.id === cat.parentId)?.isNotExpense : false);
+
   return (
     <>
       <tr className={cn(isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
@@ -349,8 +442,8 @@ const TransactionRowSmall: React.FC<{
             <span className="font-medium text-slate-800 truncate flex-1" title={transaction.description}>
               {transaction.description}
             </span>
-            <span className={cn("font-medium whitespace-nowrap shrink-0", transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
-              {formatCurrency(transaction.amount)}
+            <span className={cn("font-medium whitespace-nowrap shrink-0", isNotExpense ? "text-slate-800" : transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
+              {isNotExpense ? formatCurrency(Math.abs(transaction.amount), true) : formatCurrency(transaction.amount)}
             </span>
           </div>
         </td>
@@ -385,7 +478,7 @@ interface TransactionsTableProps {
   handleSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelect: (id: string) => void;
   onUpdateCategory: (transactionId: string, categoryId: string | null) => void;
-  formatCurrency: (amount: number) => string;
+  formatCurrency: (amount: number, forceNoSign?: boolean) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
   selectedCategory: string;
@@ -407,7 +500,38 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const { t } = useI18n();
   const { state, dispatch } = useAppContext();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [sortColumn, setSortColumn] = useState<'date' | 'title' | 'category' | 'amount'>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  const sortedTransactions = React.useMemo(() => {
+    return [...filteredTransactions].sort((a, b) => {
+      let comparison = 0;
+      if (sortColumn === 'date') {
+        comparison = a.date.localeCompare(b.date);
+      } else if (sortColumn === 'title') {
+        comparison = a.description.localeCompare(b.description);
+      } else if (sortColumn === 'category') {
+        const catA = categories.find(c => c.id === a.categoryId)?.name || '';
+        const catB = categories.find(c => c.id === b.categoryId)?.name || '';
+        comparison = catA.localeCompare(catB);
+      } else if (sortColumn === 'amount') {
+        comparison = a.amount - b.amount;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [filteredTransactions, sortColumn, sortDirection, categories]);
+
+  const handleSort = (column: 'date' | 'title' | 'category' | 'amount') => {
+    if (sortColumn === column) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection(column === 'date' ? 'desc' : 'asc');
+    }
+  };
 
   const isAllSelected = filteredTransactions.length > 0 && selectedTransactions.size === filteredTransactions.length;
   const isNoneAvailable = filteredTransactions.length === 0;
@@ -455,6 +579,23 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     setSelectedTransactions(new Set());
   };
 
+  const handleEditSave = (updatedTransaction: Transaction) => {
+    dispatch({ type: 'UPDATE_TRANSACTION', payload: updatedTransaction });
+    setIsEditModalOpen(false);
+    setSelectedTransactions(new Set());
+  };
+
+  const handleSplitSave = (newTransactions: Transaction[]) => {
+    const selectedId = Array.from(selectedTransactions)[0];
+    dispatch({ type: 'SPLIT_TRANSACTION', payload: { id: selectedId, newTransactions } });
+    setIsSplitModalOpen(false);
+    setSelectedTransactions(new Set());
+  };
+
+  const selectedTransaction = selectedTransactions.size === 1 
+    ? state.transactions.find(t => t.id === Array.from(selectedTransactions)[0])
+    : null;
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto md:overflow-visible">
@@ -466,8 +607,13 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               onChange={handleSelectAll}
               selectedCount={selectedTransactions.size}
               onMerge={handleMergeSelected}
+              onEdit={() => setIsEditModalOpen(true)}
+              onSplit={() => setIsSplitModalOpen(true)}
               onDelete={() => setIsConfirmingDelete(true)}
               isTabletMinimized={isTabletMinimized}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
             />
             <MobileTableHeader
               isChecked={isAllSelected}
@@ -475,14 +621,19 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               onChange={handleSelectAll}
               selectedCount={selectedTransactions.size}
               onMerge={handleMergeSelected}
+              onEdit={() => setIsEditModalOpen(true)}
+              onSplit={() => setIsSplitModalOpen(true)}
               onDelete={() => setIsConfirmingDelete(true)}
               isTabletMinimized={isTabletMinimized}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
             />
           </thead>
           {isNoneAvailable ? (
             <NoTransactionsRow selectedCategory={selectedCategory} categories={categories} />
           ) : (
-            filteredTransactions.map(transaction => (
+            sortedTransactions.map(transaction => (
               <tbody key={transaction.id} className={cn("transition-colors border-b xl:border-none border-slate-100", selectedTransactions.has(transaction.id) && "bg-indigo-50/30", openDropdownId === transaction.id ? "" : "hover:bg-slate-50/80")}>
                 {/* Desktop Row */}
                 <TransactionRowFull
@@ -554,6 +705,24 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
         >
           <p className="text-slate-600">{t('confirmDeleteTransactions')}</p>
         </Modal>
+      )}
+
+      {isEditModalOpen && selectedTransaction && (
+        <EditTransactionModal
+          transaction={selectedTransaction}
+          categories={categories}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleEditSave}
+          getCategoryEmoji={getCategoryEmoji}
+        />
+      )}
+
+      {isSplitModalOpen && selectedTransaction && (
+        <SplitTransactionModal
+          transaction={selectedTransaction}
+          onClose={() => setIsSplitModalOpen(false)}
+          onSave={handleSplitSave}
+        />
       )}
     </div>
   );

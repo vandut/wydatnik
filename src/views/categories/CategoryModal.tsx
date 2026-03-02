@@ -4,6 +4,7 @@ import { useAppContext } from '../../store/AppContext';
 import { Category } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 import Modal from '../../components/Modal';
+import { cn } from '../../lib/utils';
 
 const CategoryModal: React.FC<{
   category?: Category;
@@ -15,8 +16,13 @@ const CategoryModal: React.FC<{
   const [name, setName] = useState(category?.name || '');
   const [parentId, setParentId] = useState<string | null>(category?.parentId || null);
   const [emoji, setEmoji] = useState(category?.emoji || '⚪');
+  const [isNotExpense, setIsNotExpense] = useState(category?.isNotExpense || false);
 
   const mainCategories = state.categories.filter(c => !c.parentId && c.id !== category?.id);
+  
+  const parentCategory = parentId ? state.categories.find(c => c.id === parentId) : null;
+  const isParentNotExpense = parentCategory?.isNotExpense || false;
+  const effectiveIsNotExpense = isParentNotExpense || isNotExpense;
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -24,12 +30,12 @@ const CategoryModal: React.FC<{
     if (category) {
       dispatch({
         type: 'UPDATE_CATEGORY',
-        payload: { ...category, name, parentId, emoji: parentId ? undefined : emoji },
+        payload: { ...category, name, parentId, emoji: parentId ? undefined : emoji, isNotExpense },
       });
     } else {
       dispatch({
         type: 'ADD_CATEGORY',
-        payload: { id: uuidv4(), name, parentId, emoji: parentId ? undefined : emoji },
+        payload: { id: uuidv4(), name, parentId, emoji: parentId ? undefined : emoji, isNotExpense },
       });
     }
     onClose();
@@ -95,6 +101,29 @@ const CategoryModal: React.FC<{
             />
           </div>
         )}
+
+        <div className="flex items-center gap-2 pt-2">
+          <input
+            type="checkbox"
+            id="isNotExpense"
+            checked={effectiveIsNotExpense}
+            onChange={(e) => setIsNotExpense(e.target.checked)}
+            disabled={isParentNotExpense}
+            className={cn(
+              "w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500",
+              isParentNotExpense ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            )}
+          />
+          <label 
+            htmlFor="isNotExpense" 
+            className={cn(
+              "text-sm font-medium text-slate-700",
+              isParentNotExpense ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            )}
+          >
+            {t('excludeFromExpenses')}
+          </label>
+        </div>
       </div>
     </Modal>
   );

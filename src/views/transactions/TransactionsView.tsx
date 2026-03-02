@@ -137,11 +137,16 @@ const TransactionsView: React.FC = () => {
     let income = 0;
     let expenses = 0;
     filteredTransactions.forEach(t => {
-      if (t.amount > 0) income += t.amount;
-      else expenses += Math.abs(t.amount);
+      const cat = state.categories.find(c => c.id === t.categoryId);
+      const isNotExpense = cat?.isNotExpense || (cat?.parentId ? state.categories.find(c => c.id === cat.parentId)?.isNotExpense : false);
+
+      if (!isNotExpense) {
+        if (t.amount > 0) income += t.amount;
+        else expenses += Math.abs(t.amount);
+      }
     });
     return { income, expenses, total: income - expenses };
-  }, [filteredTransactions]);
+  }, [filteredTransactions, state.categories]);
 
   // Category summary for sidebar
   const categorySummary = useMemo(() => {
@@ -155,8 +160,16 @@ const TransactionsView: React.FC = () => {
       const mainCatId = cat?.parentId || cat?.id || 'uncategorized';
       const subCatId = cat?.parentId ? cat.id : null;
       
+      const mainCat = mainCatId !== 'uncategorized' ? state.categories.find(c => c.id === mainCatId) : null;
+      const isMainCatNotExpense = mainCat?.isNotExpense || false;
+      const isSubCatNotExpense = cat?.isNotExpense || false;
+
       // Add to main category
-      summary[mainCatId] = (summary[mainCatId] || 0) + t.amount;
+      if (!isMainCatNotExpense && isSubCatNotExpense && subCatId) {
+        // Do not add to main category summary if subcategory is not an expense but parent is
+      } else {
+        summary[mainCatId] = (summary[mainCatId] || 0) + t.amount;
+      }
       
       // Add to subcategory if it exists
       if (subCatId) {
@@ -164,6 +177,22 @@ const TransactionsView: React.FC = () => {
       }
     });
     return summary;
+  }, [state.transactions, selectedMonth, state.categories]);
+
+  const monthlyTotalBalance = useMemo(() => {
+    let total = 0;
+    const baseFiltered = state.transactions.filter(t => 
+      t.date.startsWith(selectedMonth)
+    );
+    baseFiltered.forEach(t => {
+      const cat = state.categories.find(c => c.id === t.categoryId);
+      const isNotExpense = cat?.isNotExpense || (cat?.parentId ? state.categories.find(c => c.id === cat.parentId)?.isNotExpense : false);
+
+      if (!isNotExpense) {
+        total += t.amount;
+      }
+    });
+    return total;
   }, [state.transactions, selectedMonth, state.categories]);
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,8 +214,12 @@ const TransactionsView: React.FC = () => {
     dispatch({ type: 'UPDATE_TRANSACTION_CATEGORY', payload: { id: transactionId, categoryId } });
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat(language, { style: 'currency', currency: state.currency }).format(amount);
+  const formatCurrency = (amount: number, forceNoSign: boolean = false) => {
+    return new Intl.NumberFormat(language, { 
+      style: 'currency', 
+      currency: state.currency,
+      signDisplay: forceNoSign ? 'never' : 'auto'
+    }).format(amount);
   };
 
   const getCategoryEmoji = (id: string | null) => {
@@ -215,6 +248,7 @@ const TransactionsView: React.FC = () => {
             setIsMobileCategoriesOpen(false);
           }}
           categorySummary={categorySummary}
+          totalBalance={monthlyTotalBalance}
           formatCurrency={formatCurrency}
           hideHeader={true}
         />
@@ -229,6 +263,7 @@ const TransactionsView: React.FC = () => {
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           categorySummary={categorySummary}
+          totalBalance={monthlyTotalBalance}
           formatCurrency={formatCurrency}
           isMinimized={isTabletMinimized}
           onToggleMinimize={() => setIsTabletMinimized(!isTabletMinimized)}
