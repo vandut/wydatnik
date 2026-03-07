@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useI18n } from '../../i18n/I18nContext';
-import { useAppContext } from '../../store/AppContext';
 import { format, parseISO } from 'date-fns';
 import { cn } from '../../lib/utils';
-import { Category } from '../../types';
-import { Transaction } from '../../store/AppContext';
+import { Category, Transaction } from '../../types';
 import CategoryDropdown from './CategoryDropdown';
 import { Trash2, Merge, ChevronUp, ChevronDown, Pencil, Split } from 'lucide-react';
 import Modal from '../../components/Modal';
 import { v4 as uuidv4 } from 'uuid';
 import EditTransactionModal from './EditTransactionModal';
 import SplitTransactionModal from './SplitTransactionModal';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
+import MergeTransactionsModal from './MergeTransactionsModal';
 
 // --- INNER COMPONENTS ---
 
@@ -43,7 +43,11 @@ const DesktopTableHeader: React.FC<{
   sortColumn: 'date' | 'title' | 'category' | 'amount';
   sortDirection: 'asc' | 'desc';
   onSort: (column: 'date' | 'title' | 'category' | 'amount') => void;
-}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onEdit, onSplit, onDelete, isTabletMinimized, sortColumn, sortDirection, onSort }) => {
+  categories: Category[];
+  getCategoryEmoji: (id: string | null) => string;
+  commonCategoryId: string | null | undefined;
+  onUpdateBulkCategory: (categoryId: string | null) => void;
+}> = ({ isChecked, isDisabled, onChange, selectedCount, onMerge, onEdit, onSplit, onDelete, isTabletMinimized, sortColumn, sortDirection, onSort, categories, getCategoryEmoji, commonCategoryId, onUpdateBulkCategory }) => {
   const { t } = useI18n();
   
   const renderSortableHeader = (column: 'date' | 'title' | 'category' | 'amount', label: string, className: string) => {
@@ -77,6 +81,18 @@ const DesktopTableHeader: React.FC<{
                 {selectedCount} {t('selected')}
               </span>
               <div className="flex items-center gap-2">
+                <div className={cn(isTabletMinimized ? "w-[60px] lg:w-48 xl:w-48" : "w-[60px] xl:w-48")}>
+                  <CategoryDropdown
+                    categoryId={commonCategoryId === undefined ? null : commonCategoryId}
+                    categories={categories}
+                    onChange={onUpdateBulkCategory}
+                    getCategoryEmoji={getCategoryEmoji}
+                    onOpenChange={() => {}}
+                    isMixed={commonCategoryId === undefined}
+                    compact={true}
+                    hideLabelBreakpoint={isTabletMinimized ? 'lg' : 'xl'}
+                  />
+                </div>
                 <button
                   onClick={onEdit}
                   disabled={selectedCount !== 1}
@@ -113,10 +129,10 @@ const DesktopTableHeader: React.FC<{
           </th>
         ) : (
           <>
-            {renderSortableHeader('date', t('date'), 'w-32')}
-            {renderSortableHeader('title', t('title'), 'w-[40%]')}
-            {renderSortableHeader('category', t('category'), 'w-64')}
-            {renderSortableHeader('amount', t('amount'), 'text-right')}
+            {renderSortableHeader('date', t('date'), 'w-28 lg:w-32')}
+            {renderSortableHeader('title', t('title'), '')}
+            {renderSortableHeader('category', t('category'), 'w-48 lg:w-64')}
+            {renderSortableHeader('amount', t('amount'), 'w-28 lg:w-32 text-right')}
           </>
         )}
       </tr>
@@ -124,10 +140,10 @@ const DesktopTableHeader: React.FC<{
       {selectedCount > 0 && (
         <tr className={cn("hidden invisible h-0", isTabletMinimized ? "sm:table-row" : "lg:table-row")}>
           <th className="p-0 w-12"></th>
-          <th className="p-0 w-32"></th>
-          <th className="p-0 w-[40%]"></th>
-          <th className="p-0 w-64"></th>
+          <th className="p-0 w-28 lg:w-32"></th>
           <th className="p-0"></th>
+          <th className="p-0 w-48 lg:w-64"></th>
+          <th className="p-0 w-28 lg:w-32"></th>
         </tr>
       )}
     </>
@@ -313,7 +329,7 @@ const TransactionRowFull: React.FC<{
       <td className="p-4 text-slate-500">
         {format(parseISO(transaction.date), 'dd.MM.yyyy')}
       </td>
-      <td className="p-4 font-medium text-slate-800 truncate max-w-[200px] xl:max-w-md" title={transaction.description}>
+      <td className="p-4 font-medium text-slate-800 truncate" title={transaction.description}>
         {transaction.description}
       </td>
       <td className="p-4">
@@ -374,7 +390,7 @@ const TransactionRowMid: React.FC<{
         <td className="px-4 pt-4 pb-2 text-slate-500 align-top">
           {format(parseISO(transaction.date), 'dd.MM.yyyy')}
         </td>
-        <td colSpan={2} className="px-4 pt-4 pb-2 font-medium text-slate-800 truncate max-w-[200px] align-top" title={transaction.description}>
+        <td colSpan={2} className="px-4 pt-4 pb-2 font-medium text-slate-800 truncate align-top" title={transaction.description}>
           {transaction.description}
         </td>
         <td className={cn("px-4 pt-4 pb-2 text-right font-medium whitespace-nowrap align-top", isNotExpense ? "text-slate-800" : transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
@@ -472,12 +488,17 @@ const TransactionRowSmall: React.FC<{
 
 interface TransactionsTableProps {
   filteredTransactions: Transaction[];
+  allTransactions: Transaction[];
   categories: Category[];
   selectedTransactions: Set<string>;
   setSelectedTransactions: (set: Set<string>) => void;
   handleSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelect: (id: string) => void;
   onUpdateCategory: (transactionId: string, categoryId: string | null) => void;
+  onDeleteTransactions: (ids: string[]) => void;
+  onMergeTransactions: (ids: string[], mergedTransaction: Transaction | null) => void;
+  onUpdateTransaction: (transaction: Transaction) => void;
+  onSplitTransaction: (id: string, newTransactions: Transaction[]) => void;
   formatCurrency: (amount: number, forceNoSign?: boolean) => string;
   getCategoryEmoji: (id: string | null) => string;
   isTabletMinimized: boolean;
@@ -486,20 +507,25 @@ interface TransactionsTableProps {
 
 const TransactionsTable: React.FC<TransactionsTableProps> = ({
   filteredTransactions,
+  allTransactions,
   categories,
   selectedTransactions,
   setSelectedTransactions,
   handleSelectAll,
   handleSelect,
   onUpdateCategory,
+  onDeleteTransactions,
+  onMergeTransactions,
+  onUpdateTransaction,
+  onSplitTransaction,
   formatCurrency,
   getCategoryEmoji,
   isTabletMinimized,
   selectedCategory,
 }) => {
   const { t } = useI18n();
-  const { state, dispatch } = useAppContext();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isConfirmingMerge, setIsConfirmingMerge] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -533,28 +559,37 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     }
   };
 
-  const isAllSelected = filteredTransactions.length > 0 && selectedTransactions.size === filteredTransactions.length;
+  const currentCategorySelectedIds = Array.from(selectedTransactions).filter(id => 
+    filteredTransactions.some(t => t.id === id)
+  );
+  const selectedCount = currentCategorySelectedIds.length;
+
+  const isAllSelected = filteredTransactions.length > 0 && selectedCount === filteredTransactions.length;
   const isNoneAvailable = filteredTransactions.length === 0;
 
   const handleDeleteSelected = () => {
-    dispatch({ type: 'DELETE_TRANSACTIONS', payload: Array.from(selectedTransactions) });
-    setSelectedTransactions(new Set());
+    onDeleteTransactions(currentCategorySelectedIds);
+    const newSelected = new Set(selectedTransactions);
+    currentCategorySelectedIds.forEach(id => newSelected.delete(id));
+    setSelectedTransactions(newSelected);
     setIsConfirmingDelete(false);
   };
 
   const handleMergeSelected = () => {
-    const ids = Array.from(selectedTransactions);
+    const ids = currentCategorySelectedIds;
     if (ids.length < 2) return;
 
-    const toMerge = state.transactions.filter(t => ids.includes(t.id));
+    const toMerge = allTransactions.filter(t => ids.includes(t.id));
     toMerge.sort((a, b) => b.date.localeCompare(a.date));
 
     const newestDate = toMerge[0].date;
     const totalAmount = toMerge.reduce((sum, t) => sum + t.amount, 0);
 
     if (Math.abs(totalAmount) < 0.01) {
-      dispatch({ type: 'DELETE_TRANSACTIONS', payload: ids });
-      setSelectedTransactions(new Set());
+      onMergeTransactions(ids, null);
+      const newSelected = new Set(selectedTransactions);
+      ids.forEach(id => newSelected.delete(id));
+      setSelectedTransactions(newSelected);
       return;
     }
 
@@ -563,50 +598,61 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const allSameCategory = toMerge.every(t => t.categoryId === toMerge[0].categoryId);
     const categoryId = allSameCategory ? toMerge[0].categoryId : null;
 
-    dispatch({
-      type: 'MERGE_TRANSACTIONS',
-      payload: {
-        ids,
-        mergedTransaction: {
-          id: uuidv4(),
-          date: newestDate,
-          description: combinedDesc,
-          amount: totalAmount,
-          categoryId
-        }
-      }
+    onMergeTransactions(ids, {
+      id: uuidv4(),
+      date: newestDate,
+      description: combinedDesc,
+      amount: totalAmount,
+      categoryId
     });
-    setSelectedTransactions(new Set());
+    const newSelected = new Set(selectedTransactions);
+    ids.forEach(id => newSelected.delete(id));
+    setSelectedTransactions(newSelected);
+    setIsConfirmingMerge(false);
   };
 
   const handleEditSave = (updatedTransaction: Transaction) => {
-    dispatch({ type: 'UPDATE_TRANSACTION', payload: updatedTransaction });
+    onUpdateTransaction(updatedTransaction);
     setIsEditModalOpen(false);
-    setSelectedTransactions(new Set());
+    const newSelected = new Set(selectedTransactions);
+    currentCategorySelectedIds.forEach(id => newSelected.delete(id));
+    setSelectedTransactions(newSelected);
   };
 
   const handleSplitSave = (newTransactions: Transaction[]) => {
-    const selectedId = Array.from(selectedTransactions)[0];
-    dispatch({ type: 'SPLIT_TRANSACTION', payload: { id: selectedId, newTransactions } });
+    const selectedId = currentCategorySelectedIds[0];
+    onSplitTransaction(selectedId, newTransactions);
     setIsSplitModalOpen(false);
-    setSelectedTransactions(new Set());
+    const newSelected = new Set(selectedTransactions);
+    currentCategorySelectedIds.forEach(id => newSelected.delete(id));
+    setSelectedTransactions(newSelected);
   };
 
-  const selectedTransaction = selectedTransactions.size === 1 
-    ? state.transactions.find(t => t.id === Array.from(selectedTransactions)[0])
+  const handleUpdateBulkCategory = (categoryId: string | null) => {
+    currentCategorySelectedIds.forEach(id => {
+      onUpdateCategory(id, categoryId);
+    });
+  };
+
+  const selectedTransaction = selectedCount === 1 
+    ? allTransactions.find(t => t.id === currentCategorySelectedIds[0])
     : null;
+
+  const selectedTransactionsList = allTransactions.filter(t => currentCategorySelectedIds.includes(t.id));
+  const allSameCategory = selectedTransactionsList.length > 0 && selectedTransactionsList.every(t => t.categoryId === selectedTransactionsList[0].categoryId);
+  const commonCategoryId = allSameCategory ? selectedTransactionsList[0].categoryId : undefined;
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto md:overflow-visible">
-        <table className="w-full text-left text-sm">
-          <thead className={cn("border-b border-slate-200 text-slate-500 font-medium", selectedTransactions.size > 0 ? "bg-indigo-50/50" : "bg-slate-50/80")}>
+        <table className="w-full text-left text-sm table-fixed">
+          <thead className={cn("border-b border-slate-200 text-slate-500 font-medium", selectedCount > 0 ? "bg-indigo-50/50" : "bg-slate-50/80")}>
             <DesktopTableHeader
               isChecked={isAllSelected}
               isDisabled={isNoneAvailable}
               onChange={handleSelectAll}
-              selectedCount={selectedTransactions.size}
-              onMerge={handleMergeSelected}
+              selectedCount={selectedCount}
+              onMerge={() => setIsConfirmingMerge(true)}
               onEdit={() => setIsEditModalOpen(true)}
               onSplit={() => setIsSplitModalOpen(true)}
               onDelete={() => setIsConfirmingDelete(true)}
@@ -614,13 +660,17 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               sortColumn={sortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
+              categories={categories}
+              getCategoryEmoji={getCategoryEmoji}
+              commonCategoryId={commonCategoryId}
+              onUpdateBulkCategory={handleUpdateBulkCategory}
             />
             <MobileTableHeader
               isChecked={isAllSelected}
               isDisabled={isNoneAvailable}
               onChange={handleSelectAll}
-              selectedCount={selectedTransactions.size}
-              onMerge={handleMergeSelected}
+              selectedCount={selectedCount}
+              onMerge={() => setIsConfirmingMerge(true)}
               onEdit={() => setIsEditModalOpen(true)}
               onSplit={() => setIsSplitModalOpen(true)}
               onDelete={() => setIsConfirmingDelete(true)}
@@ -683,28 +733,21 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
       </div>
 
       {isConfirmingDelete && (
-        <Modal 
-          title={t('confirmDelete')} 
+        <ConfirmDeleteModal
           onClose={() => setIsConfirmingDelete(false)}
-          footer={
-            <>
-              <button
-                onClick={() => setIsConfirmingDelete(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
-              >
-                {t('cancel')}
-              </button>
-              <button
-                onClick={handleDeleteSelected}
-                className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors cursor-pointer"
-              >
-                {t('delete')}
-              </button>
-            </>
-          }
-        >
-          <p className="text-slate-600">{t('confirmDeleteTransactions')}</p>
-        </Modal>
+          onConfirm={handleDeleteSelected}
+          selectedCount={selectedCount}
+        />
+      )}
+
+      {isConfirmingMerge && (
+        <MergeTransactionsModal
+          onClose={() => setIsConfirmingMerge(false)}
+          onConfirm={handleMergeSelected}
+          selectedCount={selectedCount}
+          selectedTransactionsList={selectedTransactionsList}
+          formatCurrency={formatCurrency}
+        />
       )}
 
       {isEditModalOpen && selectedTransaction && (

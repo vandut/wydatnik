@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useI18n } from '../../i18n/I18nContext';
-import { useAppContext } from '../../store/AppContext';
 import { cn } from '../../lib/utils';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
+import { Category } from '../../types';
 
 interface TransactionCategoriesProps {
+  categories: Category[];
   selectedCategory: string;
   setSelectedCategory: (id: string) => void;
   categorySummary: Record<string, number>;
@@ -17,6 +18,7 @@ interface TransactionCategoriesProps {
 }
 
 const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
+  categories,
   selectedCategory,
   setSelectedCategory,
   categorySummary,
@@ -28,14 +30,13 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
   showMinimizeButton = false,
 }) => {
   const { t } = useI18n();
-  const { state } = useAppContext();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   // Build category tree for dropdown
-  const mainCategories = state.categories.filter(c => !c.parentId);
+  const mainCategories = categories.filter(c => !c.parentId);
 
   const categoriesWithSubcategories = mainCategories.filter(cat => 
-    state.categories.some(c => c.parentId === cat.id)
+    categories.some(c => c.parentId === cat.id)
   );
   
   const areAllExpanded = categoriesWithSubcategories.length > 0 && 
@@ -53,12 +54,12 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
   // If minimized, switch to main category if a subcategory is selected
   useEffect(() => {
     if (isMinimized && selectedCategory !== 'all' && selectedCategory !== 'uncategorized') {
-      const cat = state.categories.find(c => c.id === selectedCategory);
+      const cat = categories.find(c => c.id === selectedCategory);
       if (cat && cat.parentId) {
         setSelectedCategory(cat.parentId);
       }
     }
-  }, [isMinimized, selectedCategory, state.categories, setSelectedCategory]);
+  }, [isMinimized, selectedCategory, categories, setSelectedCategory]);
 
   const toggleExpand = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -187,7 +188,7 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
         
         {/* Main Categories */}
         {mainCategories.map(cat => {
-          const subcategories = state.categories.filter(c => c.parentId === cat.id);
+          const subcategories = categories.filter(c => c.parentId === cat.id);
           const hasChildren = subcategories.length > 0;
           const isExpanded = expandedCategories.has(cat.id);
           const isSelected = selectedCategory === cat.id;

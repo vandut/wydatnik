@@ -11,6 +11,9 @@ interface CategoryDropdownProps {
   onChange: (categoryId: string | null) => void;
   getCategoryEmoji: (id: string | null) => string;
   onOpenChange?: (isOpen: boolean) => void;
+  isMixed?: boolean;
+  compact?: boolean;
+  hideLabelBreakpoint?: 'lg' | 'xl';
 }
 
 const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
@@ -19,6 +22,9 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   onChange,
   getCategoryEmoji,
   onOpenChange,
+  isMixed,
+  compact,
+  hideLabelBreakpoint,
 }) => {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
@@ -28,16 +34,23 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
-  const mainCategories = categories.filter(c => !c.parentId);
-
   const selectedCategory = categories.find(c => c.id === categoryId);
   const parentCategory = selectedCategory?.parentId 
     ? categories.find(c => c.id === selectedCategory.parentId) 
     : null;
 
-  const mainLabel = parentCategory ? parentCategory.name : (selectedCategory ? selectedCategory.name : t('uncategorized'));
-  const subLabel = parentCategory ? selectedCategory.name : '—';
-  const emoji = getCategoryEmoji(categoryId);
+  let mainLabel = '';
+  let subLabel = '';
+  let emoji = '';
+
+  if (!isMixed) {
+    mainLabel = parentCategory ? parentCategory.name : (selectedCategory ? selectedCategory.name : t('uncategorized'));
+    subLabel = parentCategory ? selectedCategory.name : '—';
+    emoji = getCategoryEmoji(categoryId);
+  } else {
+    mainLabel = '';
+    emoji = '';
+  }
 
   useLayoutEffect(() => {
     if (isOpen && triggerRef.current) {
@@ -120,60 +133,67 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
     setIsOpen(false);
   };
 
-  const dropdownContent = (
-    <div className="p-1">
-      <button
-        onClick={() => handleSelect(null)}
-        className={cn(
-          "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
-          categoryId === null ? "text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"
-        )}
-      >
-        <span className="w-6 text-center text-base">❓</span>
-        <span>{t('uncategorized')}</span>
-      </button>
-      
-      {mainCategories.map(main => (
-        <div key={main.id} className="mt-2">
-          <button
-            onClick={() => handleSelect(main.id)}
-            className={cn(
-              "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
-              categoryId === main.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50 font-medium"
-            )}
-          >
-            <span className="w-6 text-center text-base">{main.emoji}</span>
-            <span>{main.name}</span>
-          </button>
-          
-          <div className="relative mt-0.5">
-            {categories.filter(c => c.parentId === main.id).length > 0 && (
-              <div 
-                className="absolute left-[20px] top-0 w-px bg-slate-200" 
-                style={{ bottom: '14px' }}
-              />
-            )}
-            
-            {categories.filter(c => c.parentId === main.id).map(sub => (
-              <div key={sub.id} className="relative flex items-center pl-[38px] pr-2">
-                <div className="absolute left-[20px] top-1/2 w-4 h-px bg-slate-200" />
+  let dropdownContent = null;
+  if (isOpen) {
+    const mainCategories = categories.filter(c => !c.parentId);
+    dropdownContent = (
+      <div className="p-1">
+        <button
+          onClick={() => handleSelect(null)}
+          className={cn(
+            "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
+            categoryId === null ? "text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"
+          )}
+        >
+          <span className="w-6 text-center text-base">❓</span>
+          <span>{t('uncategorized')}</span>
+        </button>
+        
+        {mainCategories.map(main => {
+          const subCategories = categories.filter(c => c.parentId === main.id);
+          return (
+            <div key={main.id} className="mt-2">
+              <button
+                onClick={() => handleSelect(main.id)}
+                className={cn(
+                  "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
+                  categoryId === main.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50 font-medium"
+                )}
+              >
+                <span className="w-6 text-center text-base">{main.emoji}</span>
+                <span>{main.name}</span>
+              </button>
+              
+              <div className="relative mt-0.5">
+                {subCategories.length > 0 && (
+                  <div 
+                    className="absolute left-[20px] top-0 w-px bg-slate-200" 
+                    style={{ bottom: '14px' }}
+                  />
+                )}
                 
-                <button
-                  onClick={() => handleSelect(sub.id)}
-                  className={cn(
-                    "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors cursor-pointer",
-                    categoryId === sub.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
-                  )}
-                >
-                  {sub.name}
-                </button>
+                {subCategories.map(sub => (
+                  <div key={sub.id} className="relative flex items-center pl-[38px] pr-2">
+                    <div className="absolute left-[20px] top-1/2 w-4 h-px bg-slate-200" />
+                    
+                    <button
+                      onClick={() => handleSelect(sub.id)}
+                      className={cn(
+                        "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors cursor-pointer",
+                        categoryId === sub.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
+                      )}
+                    >
+                      {sub.name}
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full">
@@ -182,30 +202,49 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full bg-white border py-1.5 px-2 flex items-center gap-2 text-left focus:outline-none cursor-pointer",
-          isOpen ? "xl:border-indigo-500" : "border-slate-200 hover:border-slate-300 rounded-xl",
+          "w-full bg-white border flex items-center gap-2 text-left focus:outline-none cursor-pointer",
+          hideLabelBreakpoint === 'lg' && "justify-center lg:justify-start",
+          hideLabelBreakpoint === 'xl' && "justify-center xl:justify-start",
+          compact ? cn("py-1.5 rounded-lg h-[34px]", 
+            hideLabelBreakpoint === 'lg' ? "px-2 lg:px-3" : 
+            hideLabelBreakpoint === 'xl' ? "px-2 xl:px-3" : "px-3"
+          ) : "py-1.5 px-2 rounded-xl",
+          isOpen ? "xl:border-indigo-500" : "border-slate-200 hover:border-slate-300",
           // Only remove border radius on desktop (xl) when dropdown is open
-          isOpen && position === 'bottom' && "xl:rounded-t-xl xl:rounded-b-none xl:border-b-transparent rounded-xl",
-          isOpen && position === 'top' && "xl:rounded-b-xl xl:rounded-t-none xl:border-t-transparent rounded-xl",
+          isOpen && position === 'bottom' && (compact ? "xl:rounded-t-lg xl:rounded-b-none xl:border-b-transparent" : "xl:rounded-t-xl xl:rounded-b-none xl:border-b-transparent"),
+          isOpen && position === 'top' && (compact ? "xl:rounded-b-lg xl:rounded-t-none xl:border-t-transparent" : "xl:rounded-b-xl xl:rounded-t-none xl:border-t-transparent"),
           // Keep normal border on mobile/tablet when open
           isOpen && "border-slate-200 xl:border-indigo-500"
         )}
       >
-        <div className="w-6 flex items-center justify-center text-lg shrink-0">
-          {emoji}
+        <div className={cn("flex items-center justify-center shrink-0", compact ? "w-5 text-base" : "w-6 text-lg", !emoji && "opacity-0")}>
+          {emoji || '❓'}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-xs font-medium text-slate-900 truncate leading-tight">
-            {mainLabel}
-          </div>
-          <div className="text-[10px] text-slate-500 truncate leading-tight mt-0.5">
-            {subLabel}
-          </div>
+        <div className={cn("flex-1 min-w-0", 
+          hideLabelBreakpoint === 'lg' && "hidden lg:block",
+          hideLabelBreakpoint === 'xl' && "hidden xl:block"
+        )}>
+          {mainLabel && (
+            <div className={cn("font-medium text-slate-900 truncate leading-tight", compact ? "text-sm" : "text-xs")}>
+              {mainLabel}
+            </div>
+          )}
+          {!compact && subLabel && (
+            <div className="text-[10px] text-slate-500 truncate leading-tight mt-0.5">
+              {subLabel}
+            </div>
+          )}
         </div>
         {isOpen ? (
-          <ChevronUp className="w-4 h-4 text-slate-400 shrink-0 mr-1" />
+          <ChevronUp className={cn("w-4 h-4 text-slate-400 shrink-0", 
+            hideLabelBreakpoint === 'lg' ? "mr-0 lg:mr-1" : 
+            hideLabelBreakpoint === 'xl' ? "mr-0 xl:mr-1" : "mr-1"
+          )} />
         ) : (
-          <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 mr-1" />
+          <ChevronDown className={cn("w-4 h-4 text-slate-400 shrink-0", 
+            hideLabelBreakpoint === 'lg' ? "mr-0 lg:mr-1" : 
+            hideLabelBreakpoint === 'xl' ? "mr-0 xl:mr-1" : "mr-1"
+          )} />
         )}
       </button>
 

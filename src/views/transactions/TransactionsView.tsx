@@ -4,7 +4,9 @@ import { useAppContext } from '../../store/AppContext';
 import { format, addMonths, subMonths } from 'date-fns';
 import { pl, enUS } from 'date-fns/locale';
 import { cn } from '../../lib/utils';
-import { ChevronLeft, ChevronRight, UploadCloud } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, UploadCloud, X, Search } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import MonthDropdown from './MonthDropdown';
 import ImportModal from './ImportModal';
 import Drawer from '../../components/Drawer';
 import TransactionCategories from './TransactionCategories';
@@ -26,13 +28,14 @@ const BalancesSummary: React.FC<{
   );
 };
 
+
+
 const DateNavigation: React.FC<{
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
-}> = ({ currentDate, setCurrentDate }) => {
-  const { t, language } = useI18n();
-  const dateLocale = language === 'pl' ? pl : enUS;
-
+  availableMonths: string[];
+}> = ({ currentDate, setCurrentDate, availableMonths }) => {
+  const { t } = useI18n();
   return (
     <div className="flex items-center gap-2">
       <button onClick={() => setCurrentDate(new Date())} className="mr-2 px-3 py-1.5 text-sm font-medium text-slate-600 bg-slate-200/50 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
@@ -44,9 +47,40 @@ const DateNavigation: React.FC<{
       <button onClick={() => setCurrentDate(addMonths(currentDate, 1))} className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer">
         <ChevronRight className="w-5 h-5" />
       </button>
-      <span className="text-lg font-medium text-slate-800 capitalize min-w-[140px] text-center">
-        {format(currentDate, 'LLLL yyyy', { locale: dateLocale })}
-      </span>
+      <MonthDropdown
+        currentDate={currentDate}
+        setCurrentDate={setCurrentDate}
+        availableMonths={availableMonths}
+      />
+    </div>
+  );
+};
+
+const TopSearch: React.FC<{
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}> = ({ searchQuery, setSearchQuery }) => {
+  const { t } = useI18n();
+  return (
+    <div className="hidden md:flex relative w-64">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <Search className="h-4 w-4 text-slate-400" />
+      </div>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder={t('search')}
+        className="block w-full pl-10 pr-10 py-2 border border-slate-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+      />
+      {searchQuery && (
+        <button
+          onClick={() => setSearchQuery('')}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
     </div>
   );
 };
@@ -56,7 +90,9 @@ const TransactionsHeader: React.FC<{
   formatCurrency: (amount: number) => string;
   onImportClick: () => void;
   isTabletMinimized: boolean;
-}> = ({ balances, formatCurrency, onImportClick, isTabletMinimized }) => {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}> = ({ balances, formatCurrency, onImportClick, isTabletMinimized, searchQuery, setSearchQuery }) => {
   const { t } = useI18n();
 
   return (
@@ -70,17 +106,19 @@ const TransactionsHeader: React.FC<{
         <BalancesSummary balances={balances} formatCurrency={formatCurrency} />
       </div>
 
-      <button
-        onClick={onImportClick}
-        className={cn(
-          "order-2 flex items-center gap-2 px-3 md:px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer",
-          isTabletMinimized ? "md:order-3" : "lg:order-3"
-        )}
-      >
-        <UploadCloud className="w-4 h-4" />
-        <span className="hidden xl:inline">{t('import')}</span>
-        <span className="xl:hidden">{t('importShort')}</span>
-      </button>
+      <div className={cn(
+        "order-2 flex items-center gap-2",
+        isTabletMinimized ? "md:order-3" : "lg:order-3"
+      )}>
+        <button
+          onClick={onImportClick}
+          className="flex items-center gap-2 px-3 md:px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
+        >
+          <UploadCloud className="w-4 h-4" />
+          <span className="hidden xl:inline">{t('import')}</span>
+          <span className="xl:hidden">{t('importShort')}</span>
+        </button>
+      </div>
     </div>
   );
 };
@@ -93,6 +131,7 @@ const TransactionsView: React.FC = () => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedTransactions, setSelectedTransactions] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
   const [isTabletMinimized, setIsTabletMinimized] = useState(() => {
@@ -120,6 +159,18 @@ const TransactionsView: React.FC = () => {
   const dateLocale = language === 'pl' ? pl : enUS;
   const selectedMonth = format(currentDate, 'yyyy-MM');
 
+  // Get all available months from transactions
+  const availableMonths = useMemo(() => {
+    const months = new Set<string>();
+    state.transactions.forEach(t => {
+      months.add(t.date.substring(0, 7)); // Extract yyyy-MM
+    });
+    // Add current month if not present
+    months.add(format(new Date(), 'yyyy-MM'));
+    // Sort newest to oldest
+    return Array.from(months).sort((a, b) => b.localeCompare(a));
+  }, [state.transactions]);
+
   // Filter transactions
   const filteredTransactions = useMemo(() => {
     return state.transactions.filter(t => {
@@ -128,9 +179,10 @@ const TransactionsView: React.FC = () => {
                             (selectedCategory === 'uncategorized' && !t.categoryId) ||
                             t.categoryId === selectedCategory || 
                             state.categories.find(c => c.id === t.categoryId)?.parentId === selectedCategory;
-      return matchMonth && matchCategory;
+      const matchSearch = searchQuery === '' || t.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchMonth && matchCategory && matchSearch;
     }).sort((a, b) => b.date.localeCompare(a.date));
-  }, [state.transactions, selectedMonth, selectedCategory, state.categories]);
+  }, [state.transactions, selectedMonth, selectedCategory, state.categories, searchQuery]);
 
   // Calculate balances
   const balances = useMemo(() => {
@@ -196,11 +248,13 @@ const TransactionsView: React.FC = () => {
   }, [state.transactions, selectedMonth, state.categories]);
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSet = new Set(selectedTransactions);
     if (e.target.checked) {
-      setSelectedTransactions(new Set(filteredTransactions.map(t => t.id)));
+      filteredTransactions.forEach(t => newSet.add(t.id));
     } else {
-      setSelectedTransactions(new Set());
+      filteredTransactions.forEach(t => newSet.delete(t.id));
     }
+    setSelectedTransactions(newSet);
   };
 
   const handleSelect = (id: string) => {
@@ -212,6 +266,29 @@ const TransactionsView: React.FC = () => {
 
   const handleUpdateCategory = (transactionId: string, categoryId: string | null) => {
     dispatch({ type: 'UPDATE_TRANSACTION_CATEGORY', payload: { id: transactionId, categoryId } });
+  };
+
+  const handleDeleteTransactions = (ids: string[]) => {
+    dispatch({ type: 'DELETE_TRANSACTIONS', payload: ids });
+  };
+
+  const handleMergeTransactions = (ids: string[], mergedTransaction: import('../../types').Transaction | null) => {
+    if (mergedTransaction) {
+      dispatch({
+        type: 'MERGE_TRANSACTIONS',
+        payload: { ids, mergedTransaction }
+      });
+    } else {
+      dispatch({ type: 'DELETE_TRANSACTIONS', payload: ids });
+    }
+  };
+
+  const handleUpdateTransaction = (transaction: import('../../types').Transaction) => {
+    dispatch({ type: 'UPDATE_TRANSACTION', payload: transaction });
+  };
+
+  const handleSplitTransaction = (id: string, newTransactions: import('../../types').Transaction[]) => {
+    dispatch({ type: 'SPLIT_TRANSACTION', payload: { id, newTransactions } });
   };
 
   const formatCurrency = (amount: number, forceNoSign: boolean = false) => {
@@ -233,6 +310,10 @@ const TransactionsView: React.FC = () => {
     return cat.emoji || '❓';
   };
 
+  const handleImportTransactions = (transactions: import('../../types').Transaction[]) => {
+    dispatch({ type: 'ADD_TRANSACTIONS', payload: transactions });
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-full relative overflow-hidden">
       {/* Mobile Categories Drawer */}
@@ -242,6 +323,7 @@ const TransactionsView: React.FC = () => {
         title={t('categories')}
       >
         <TransactionCategories
+          categories={state.categories}
           selectedCategory={selectedCategory}
           setSelectedCategory={(id) => {
             setSelectedCategory(id);
@@ -260,6 +342,7 @@ const TransactionsView: React.FC = () => {
         isTabletMinimized ? "w-16 xl:w-72" : "w-72"
       )}>
         <TransactionCategories
+          categories={state.categories}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           categorySummary={categorySummary}
@@ -274,27 +357,38 @@ const TransactionsView: React.FC = () => {
       {/* Main Content - Transactions List */}
       <div className="flex-1 flex flex-col min-w-0 bg-slate-50/50 overflow-y-auto">
         <div className="p-4 md:p-6 space-y-4 md:space-y-6 w-full">
-          <DateNavigation
-            currentDate={currentDate}
-            setCurrentDate={setCurrentDate}
-          />
+          <div className="flex items-center justify-between gap-4">
+            <DateNavigation
+              currentDate={currentDate}
+              setCurrentDate={setCurrentDate}
+              availableMonths={availableMonths}
+            />
+            <TopSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          </div>
 
           <TransactionsHeader
             balances={balances}
             formatCurrency={formatCurrency}
             onImportClick={() => setIsImportModalOpen(true)}
             isTabletMinimized={isTabletMinimized}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
           />
 
           {/* Table */}
           <TransactionsTable
             filteredTransactions={filteredTransactions}
+            allTransactions={state.transactions}
             categories={state.categories}
             selectedTransactions={selectedTransactions}
             setSelectedTransactions={setSelectedTransactions}
             handleSelectAll={handleSelectAll}
             handleSelect={handleSelect}
             onUpdateCategory={handleUpdateCategory}
+            onDeleteTransactions={handleDeleteTransactions}
+            onMergeTransactions={handleMergeTransactions}
+            onUpdateTransaction={handleUpdateTransaction}
+            onSplitTransaction={handleSplitTransaction}
             formatCurrency={formatCurrency}
             getCategoryEmoji={getCategoryEmoji}
             isTabletMinimized={isTabletMinimized}
@@ -302,7 +396,13 @@ const TransactionsView: React.FC = () => {
           />
         </div>
       </div>
-      {isImportModalOpen && <ImportModal onClose={() => setIsImportModalOpen(false)} />}
+      {isImportModalOpen && (
+        <ImportModal 
+          onClose={() => setIsImportModalOpen(false)} 
+          onImport={handleImportTransactions}
+          currency={state.currency}
+        />
+      )}
     </div>
   );
 };

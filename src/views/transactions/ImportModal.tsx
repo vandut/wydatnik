@@ -1,14 +1,19 @@
 import React, { useState, useRef } from 'react';
 import { useI18n } from '../../i18n/I18nContext';
-import { useAppContext } from '../../store/AppContext';
 import { ParserFactory } from '../../services/parsers';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadCloud } from 'lucide-react';
 import Modal from '../../components/Modal';
+import { Transaction } from '../../types';
 
-const ImportModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+interface ImportModalProps {
+  onClose: () => void;
+  onImport: (transactions: Transaction[]) => void;
+  currency: string;
+}
+
+const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }) => {
   const { t } = useI18n();
-  const { state, dispatch } = useAppContext();
   const [format, setFormat] = useState('mbank');
   const [isDragging, setIsDragging] = useState(false);
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error', text: string, summary?: { count: number, start: string, end: string } } | null>(null);
@@ -18,7 +23,7 @@ const ImportModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     try {
       const text = await file.text();
       const parser = ParserFactory.getParser(format);
-      const parsedTransactions = await parser.parse(text, { expectedCurrency: state.currency });
+      const parsedTransactions = await parser.parse(text, { expectedCurrency: currency });
       
       if (parsedTransactions.length === 0) {
         throw new Error('No transactions found');
@@ -38,7 +43,7 @@ const ImportModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         end: dates[dates.length - 1]
       };
 
-      dispatch({ type: 'ADD_TRANSACTIONS', payload: transactionsWithIds });
+      onImport(transactionsWithIds);
       setAlertMessage({ 
         type: 'success', 
         text: t('importSuccess'),
