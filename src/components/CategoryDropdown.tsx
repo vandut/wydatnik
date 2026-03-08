@@ -1,9 +1,9 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useI18n } from '../../i18n/I18nContext';
-import { Category } from '../../types';
+import { useI18n } from '../i18n/I18nContext';
+import { Category } from '../types';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '../lib/utils';
 
 interface CategoryDropdownProps {
   categoryId: string | null;
@@ -79,7 +79,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
         left: Math.round(rect.left),
         width: Math.round(rect.width),
         maxHeight: '40vh',
-        zIndex: 50,
+        zIndex: 60,
         opacity: 1,
         pointerEvents: 'auto',
       });
@@ -217,7 +217,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
           isOpen && "border-slate-200 xl:border-indigo-500"
         )}
       >
-        <div className={cn("flex items-center justify-center shrink-0", compact ? "w-5 text-base" : "w-6 text-lg", !emoji && "opacity-0")}>
+        <div className={cn("flex items-center justify-center shrink-0", compact ? "w-5 text-base" : "w-6 text-lg", isMixed && "opacity-0")}>
           {emoji || '❓'}
         </div>
         <div className={cn("flex-1 min-w-0", 

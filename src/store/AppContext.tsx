@@ -13,7 +13,7 @@ type Action =
   | { type: 'SPLIT_TRANSACTION'; payload: { id: string; newTransactions: Transaction[] } }
   | { type: 'ADD_CATEGORY'; payload: Category }
   | { type: 'UPDATE_CATEGORY'; payload: Category }
-  | { type: 'DELETE_CATEGORY'; payload: string };
+  | { type: 'DELETE_CATEGORY'; payload: { id: string; fallbackCategoryId: string | null } };
 
 const appReducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
@@ -63,16 +63,48 @@ const appReducer = (state: AppState, action: Action): AppState => {
     case 'UPDATE_CATEGORY':
       return {
         ...state,
-        categories: state.categories.map((c) => (c.id === action.payload.id ? action.payload : c)),
+        categories: state.categories.map((c) => {
+          if (c.id === action.payload.id) {
+            if (c.isSystem) {
+              // Prevent tampering with system properties
+              return {
+                ...action.payload,
+                isSystem: c.isSystem,
+                isNotExpense: c.isNotExpense,
+                parentId: c.parentId,
+                name: c.name, // Prevent renaming system categories
+                emoji: c.emoji, // Prevent changing emoji
+              };
+            }
+            return action.payload;
+          }
+          return c;
+        }),
       };
-    case 'DELETE_CATEGORY':
+    case 'DELETE_CATEGORY': {
+      const { id, fallbackCategoryId } = action.payload;
+      const categoryToDelete = state.categories.find(c => c.id === id);
+      if (categoryToDelete?.isSystem) {
+        return state; // Prevent deleting system categories
+      }
+      
+      // Get all subcategories of the deleted category
+      const subcategoryIds = state.categories
+        .filter(c => c.parentId === id)
+        .map(c => c.id);
+        
+      const idsToDelete = [id, ...subcategoryIds];
+
       return {
         ...state,
-        categories: state.categories.filter((c) => c.id !== action.payload && c.parentId !== action.payload),
+        categories: state.categories.filter((c) => !idsToDelete.includes(c.id)),
         transactions: state.transactions.map((t) =>
-          t.categoryId === action.payload ? { ...t, categoryId: null } : t
+          t.categoryId && idsToDelete.includes(t.categoryId) 
+            ? { ...t, categoryId: fallbackCategoryId } 
+            : t
         ),
       };
+    }
     default:
       return state;
   }

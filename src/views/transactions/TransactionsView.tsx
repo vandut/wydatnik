@@ -59,10 +59,11 @@ const DateNavigation: React.FC<{
 const TopSearch: React.FC<{
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-}> = ({ searchQuery, setSearchQuery }) => {
+  isTabletMinimized: boolean;
+}> = ({ searchQuery, setSearchQuery, isTabletMinimized }) => {
   const { t } = useI18n();
   return (
-    <div className="hidden md:flex relative w-64">
+    <div className={cn("hidden relative w-64", isTabletMinimized ? "md:flex" : "lg:flex")}>
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <Search className="h-4 w-4 text-slate-400" />
       </div>
@@ -90,9 +91,7 @@ const TransactionsHeader: React.FC<{
   formatCurrency: (amount: number) => string;
   onImportClick: () => void;
   isTabletMinimized: boolean;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-}> = ({ balances, formatCurrency, onImportClick, isTabletMinimized, searchQuery, setSearchQuery }) => {
+}> = ({ balances, formatCurrency, onImportClick, isTabletMinimized }) => {
   const { t } = useI18n();
 
   return (
@@ -363,7 +362,7 @@ const TransactionsView: React.FC = () => {
               setCurrentDate={setCurrentDate}
               availableMonths={availableMonths}
             />
-            <TopSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <TopSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} isTabletMinimized={isTabletMinimized} />
           </div>
 
           <TransactionsHeader
@@ -371,8 +370,6 @@ const TransactionsView: React.FC = () => {
             formatCurrency={formatCurrency}
             onImportClick={() => setIsImportModalOpen(true)}
             isTabletMinimized={isTabletMinimized}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
           />
 
           {/* Table */}

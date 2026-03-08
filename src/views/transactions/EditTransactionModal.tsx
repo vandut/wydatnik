@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useI18n } from '../../i18n/I18nContext';
 import { Transaction, Category } from '../../types';
 import Modal from '../../components/Modal';
-import CategoryDropdown from './CategoryDropdown';
+import CategoryDropdown from '../../components/CategoryDropdown';
 
 interface EditTransactionModalProps {
   transaction: Transaction;

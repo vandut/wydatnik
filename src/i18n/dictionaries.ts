@@ -66,6 +66,7 @@ export const dictionaries = {
     from: 'From',
     to: 'To',
     invalidDateRange: 'Invalid date range',
+    recategorizeTransactions: 'Recategorize transactions to:',
   },
   pl: {
     accounts: 'Rachunki',
@@ -134,6 +135,7 @@ export const dictionaries = {
     from: 'Od',
     to: 'Do',
     invalidDateRange: 'Nieprawidłowy zakres dat',
+    recategorizeTransactions: 'Przekategoryzuj transakcje na:',
   },
 };
 

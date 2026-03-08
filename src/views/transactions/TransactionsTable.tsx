@@ -3,7 +3,7 @@ import { useI18n } from '../../i18n/I18nContext';
 import { format, parseISO } from 'date-fns';
 import { cn } from '../../lib/utils';
 import { Category, Transaction } from '../../types';
-import CategoryDropdown from './CategoryDropdown';
+import CategoryDropdown from '../../components/CategoryDropdown';
 import { Trash2, Merge, ChevronUp, ChevronDown, Pencil, Split } from 'lucide-react';
 import Modal from '../../components/Modal';
 import { v4 as uuidv4 } from 'uuid';
@@ -172,7 +172,7 @@ const MobileTableHeader: React.FC<{
         <th className="p-3 w-10 align-middle">
           <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
         </th>
-        <th className="p-3 font-normal align-middle">
+        <th colSpan={4} className="p-3 font-normal align-middle">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-indigo-800">
               {selectedCount} {t('selected')}
@@ -217,7 +217,7 @@ const MobileTableHeader: React.FC<{
       <th className="p-3 w-10 align-middle">
         <HeaderCheckbox isChecked={isChecked} isDisabled={isDisabled} onChange={onChange} />
       </th>
-      <th className="p-3 text-xs font-medium text-slate-500 align-middle">
+      <th colSpan={4} className="p-3 text-xs font-medium text-slate-500 align-middle">
         <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-1 cursor-pointer select-none shrink-0" onClick={() => onSort('date')}>
             <span>{t('date')}</span>
@@ -453,7 +453,7 @@ const TransactionRowSmall: React.FC<{
             />
           </div>
         </td>
-        <td className="pt-3 px-3 pb-1 max-w-0">
+        <td colSpan={4} className="pt-3 px-3 pb-1 max-w-0">
           <div className="flex justify-between items-start gap-2">
             <span className="font-medium text-slate-800 truncate flex-1" title={transaction.description}>
               {transaction.description}
@@ -465,12 +465,12 @@ const TransactionRowSmall: React.FC<{
         </td>
       </tr>
       <tr className={cn(isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
-        <td className="px-3 py-1 text-xs text-slate-500">
+        <td colSpan={4} className="px-3 py-1 text-xs text-slate-500">
           {format(parseISO(transaction.date), 'dd.MM.yyyy')}
         </td>
       </tr>
       <tr className={cn(isTabletMinimized ? "sm:hidden" : "lg:hidden")}>
-        <td className="px-3 pt-1 pb-3">
+        <td colSpan={4} className="px-3 pt-1 pb-3">
           <CategoryDropdown
             categoryId={transaction.categoryId}
             categories={categories}

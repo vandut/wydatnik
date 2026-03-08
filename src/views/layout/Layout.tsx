@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { useI18n } from '../../i18n/I18nContext';
 import { useAppContext } from '../../store/AppContext';
+import { migrateState } from '../../store/initialState';
 import { cn } from '../../lib/utils';
 import ErrorModal from './ErrorModal';
 import { 
@@ -181,7 +182,8 @@ const Layout: React.FC = () => {
         const content = e.target?.result as string;
         const parsedState = JSON.parse(content);
         if (parsedState && parsedState.transactions && parsedState.categories && parsedState.currency) {
-          dispatch({ type: 'SET_STATE', payload: parsedState });
+          const migratedState = migrateState(parsedState);
+          dispatch({ type: 'SET_STATE', payload: migratedState });
         } else {
           setAlertMessage(t('invalidFileFormat'));
         }

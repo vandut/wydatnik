@@ -59,12 +59,16 @@ const SubcategoryList: React.FC<{
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => onEdit(sub)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => onDelete(sub.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {!sub.isSystem && (
+                    <>
+                      <button onClick={() => onEdit(sub)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => onDelete(sub.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -105,12 +109,16 @@ const CategoryCard: React.FC<{
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0 mt-0.5">
-          <button onClick={() => onEdit(main)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
-            <Edit2 className="w-4 h-4" />
-          </button>
-          <button onClick={() => onDelete(main.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {!main.isSystem && (
+            <>
+              <button onClick={() => onEdit(main)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button onClick={() => onDelete(main.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
       </div>
       
@@ -141,9 +149,9 @@ const CategoriesView: React.FC = () => {
     setCategoryToDelete(id);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = (fallbackCategoryId: string | null) => {
     if (categoryToDelete) {
-      dispatch({ type: 'DELETE_CATEGORY', payload: categoryToDelete });
+      dispatch({ type: 'DELETE_CATEGORY', payload: { id: categoryToDelete, fallbackCategoryId } });
       setCategoryToDelete(null);
     }
   };
@@ -204,6 +212,8 @@ const CategoriesView: React.FC = () => {
 
       {categoryToDelete && (
         <ConfirmDeleteCategoryModal
+          categoryId={categoryToDelete}
+          categories={state.categories}
           onClose={() => setCategoryToDelete(null)}
           onConfirm={confirmDelete}
         />
