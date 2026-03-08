@@ -11,7 +11,8 @@ import {
   Tags, 
   Save, 
   FolderOpen, 
-  Menu
+  Menu,
+  PieChart
 } from 'lucide-react';
 
 interface NavItem {
@@ -160,6 +161,7 @@ const Layout: React.FC = () => {
     { to: '/transactions', icon: ListOrdered, label: t('transactions') },
     { to: '/accounts', icon: Wallet, label: t('accounts') },
     { to: '/categories', icon: Tags, label: t('categories') },
+    { to: '/analytics', icon: PieChart, label: t('analytics') },
   ];
 
   const handleSave = () => {

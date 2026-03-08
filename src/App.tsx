@@ -6,6 +6,7 @@ import Layout from './views/layout/Layout';
 import TransactionsView from './views/transactions/TransactionsView';
 import CategoriesView from './views/categories/CategoriesView';
 import AccountsView from './views/accounts/AccountsView';
+import AnalyticsPage from './views/analytics/AnalyticsPage';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Navigate to="/transactions" replace />} />
               <Route path="transactions" element={<TransactionsView />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="categories" element={<CategoriesView />} />
               <Route path="accounts" element={<AccountsView />} />
             </Route>

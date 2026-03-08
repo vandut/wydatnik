@@ -2,6 +2,7 @@ export const dictionaries = {
   en: {
     accounts: 'Accounts',
     transactions: 'Transactions',
+    analytics: 'Analytics',
     categories: 'Categories',
     import: 'Import transactions',
     importShort: 'Import',
@@ -71,6 +72,7 @@ export const dictionaries = {
   pl: {
     accounts: 'Rachunki',
     transactions: 'Transakcje',
+    analytics: 'Analiza',
     categories: 'Kategorie',
     import: 'Importuj transakcje',
     importShort: 'Importuj',
