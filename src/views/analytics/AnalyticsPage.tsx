@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useI18n } from '../../i18n/I18nContext';
 import { useAppContext } from '../../store/AppContext';
 import { processTransactionsForAnalytics } from './analyticsUtils';
 import { SYSTEM_CATEGORY_INCOME, SYSTEM_CATEGORY_INVESTMENT } from '../../store/initialState';
 import MonthRangePicker from './MonthRangePicker';
+import CategoryFilterTable from './CategoryFilterTable';
 
 const AnalyticsPage: React.FC = () => {
   const { t } = useI18n();
@@ -32,6 +33,20 @@ const AnalyticsPage: React.FC = () => {
       SYSTEM_CATEGORY_INVESTMENT
     );
   }, [state.transactions, startMonth, endMonth]);
+
+  const allTransactionsInRange = useMemo(() => {
+    return monthData.flatMap(m => m.transactions);
+  }, [monthData]);
+
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string | null>>(new Set());
+
+  // Initialize selected categories on first load or when categories change
+  useEffect(() => {
+    const ids = new Set<string | null>();
+    ids.add(null);
+    state.categories.forEach(c => ids.add(c.id));
+    setSelectedCategoryIds(ids);
+  }, [state.categories]);
 
   return (
     <div className="flex flex-col h-full bg-slate-50 overflow-y-auto">
@@ -76,6 +91,13 @@ const AnalyticsPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <CategoryFilterTable
+          transactions={allTransactionsInRange}
+          categories={state.categories}
+          selectedCategoryIds={selectedCategoryIds}
+          onSelectionChange={setSelectedCategoryIds}
+        />
       </div>
     </div>
   );
