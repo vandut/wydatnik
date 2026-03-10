@@ -5,6 +5,7 @@ import { processTransactionsForAnalytics } from './analyticsUtils';
 import { SYSTEM_CATEGORY_INCOME, SYSTEM_CATEGORY_INVESTMENT } from '../../store/initialState';
 import MonthRangePicker from './MonthRangePicker';
 import CategoryFilterTable from './CategoryFilterTable';
+import AnalyticsCharts from './AnalyticsCharts';
 
 const AnalyticsPage: React.FC = () => {
   const { t } = useI18n();
@@ -62,35 +63,11 @@ const AnalyticsPage: React.FC = () => {
           />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">Phase 2: Data Processing Validation</h2>
-          <div className="space-y-2">
-            <p className="text-sm text-slate-600">
-              Selected Range: <span className="font-medium text-slate-900">{startMonth}</span> to <span className="font-medium text-slate-900">{endMonth}</span>
-            </p>
-            <p className="text-sm text-slate-600">
-              Total Months in Timeline: <span className="font-medium text-slate-900">{monthData.length}</span>
-            </p>
-            <div className="mt-4 border border-slate-100 rounded-xl overflow-hidden">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-slate-50 text-slate-600 font-medium">
-                  <tr>
-                    <th className="px-4 py-2 border-b border-slate-100">Month</th>
-                    <th className="px-4 py-2 border-b border-slate-100 text-right">Transactions Count</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {monthData.map(data => (
-                    <tr key={data.month} className="hover:bg-slate-50/50">
-                      <td className="px-4 py-2 font-medium text-slate-800">{data.month}</td>
-                      <td className="px-4 py-2 text-right text-slate-600">{data.transactions.length}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <AnalyticsCharts
+          monthData={monthData}
+          categories={state.categories}
+          selectedCategoryIds={selectedCategoryIds}
+        />
 
         <CategoryFilterTable
           transactions={allTransactionsInRange}

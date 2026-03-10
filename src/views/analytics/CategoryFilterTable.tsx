@@ -137,14 +137,14 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-        <h3 className="font-semibold text-slate-800">Category Filter</h3>
+        <h3 className="font-semibold text-slate-800">{t('expensesPerCategory')}</h3>
       </div>
       
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="bg-slate-50 text-slate-600 font-medium border-b border-slate-100">
             <tr>
-              <th className="px-4 py-3 w-12 text-center">
+              <th className="pl-4 pr-2 py-3 w-10 text-center">
                 <input
                   type="checkbox"
                   checked={isAllSelected}
@@ -152,14 +152,14 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                   className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
               </th>
-              <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3 text-right">Total Amount</th>
+              <th className="pl-2 pr-4 py-3">{t('category')}</th>
+              <th className="px-4 py-3 text-right">{t('totalAmount')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {/* Uncategorized Row */}
             <tr className="hover:bg-slate-50/50 transition-colors">
-              <td className="px-4 py-3 text-center">
+              <td className="pl-4 pr-2 py-3 text-center">
                 <input
                   type="checkbox"
                   checked={selectedCategoryIds.has(null)}
@@ -167,11 +167,11 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                   className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
               </td>
-              <td className="px-4 py-3 font-medium text-slate-700 flex items-center gap-2">
+              <td className="pl-2 pr-4 py-3 font-medium text-slate-700 flex items-center gap-2">
                 <span className="w-6 text-center text-base shrink-0">
                   ❓
                 </span>
-                {t('uncategorized', 'Uncategorized')}
+                {t('uncategorized')}
               </td>
               <td className="px-4 py-3 text-right font-medium text-slate-900">
                 {formatCurrencyWithColor(categoryTotals['uncategorized'] || 0)}
@@ -190,7 +190,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
               return (
                 <React.Fragment key={parent.id}>
                   <tr className="hover:bg-slate-50/50 transition-colors bg-slate-50/30">
-                    <td className="px-4 py-3 text-center">
+                    <td className="pl-4 pr-2 py-3 text-center">
                       <input
                         type="checkbox"
                         checked={isParentSelected || allChildrenSelected}
@@ -201,7 +201,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                         className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                       />
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-800 flex items-center gap-2">
+                    <td className="pl-2 pr-4 py-3 font-medium text-slate-800 flex items-center gap-2">
                       <span className="w-6 text-center text-base shrink-0">
                         {parent.emoji || '📁'}
                       </span>
@@ -223,7 +223,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                                 const isLast = index === subs.length - 1;
                                 return (
                                   <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors relative">
-                                    <td className="px-4 py-2 w-12 text-center relative z-10">
+                                    <td className="pl-4 pr-2 py-2 w-10 text-center relative z-10">
                                       <input
                                         type="checkbox"
                                         checked={selectedCategoryIds.has(sub.id)}
@@ -231,13 +231,13 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                                         className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                                       />
                                     </td>
-                                    <td className="px-4 py-2 text-slate-600 pl-[48px] flex items-center relative">
+                                    <td className="pl-2 pr-4 py-2 text-slate-600 pl-[36px] flex items-center relative">
                                       {/* Vertical line from parent */}
-                                      {!isLast && <div className="absolute left-[28px] top-0 bottom-0 w-px bg-slate-200" />}
+                                      {!isLast && <div className="absolute left-[20px] top-0 bottom-0 w-px bg-slate-200" />}
                                       {/* Vertical line for the last item (only goes down to the middle) */}
-                                      {isLast && <div className="absolute left-[28px] top-0 h-1/2 w-px bg-slate-200" />}
+                                      {isLast && <div className="absolute left-[20px] top-0 h-1/2 w-px bg-slate-200" />}
                                       {/* Horizontal branch */}
-                                      <div className="absolute left-[28px] top-1/2 w-4 h-px bg-slate-200" />
+                                      <div className="absolute left-[20px] top-1/2 w-4 h-px bg-slate-200" />
                                       
                                       {sub.name}
                                     </td>
