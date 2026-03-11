@@ -76,6 +76,8 @@ export const dictionaries = {
     expensesPerCategory: 'Expenses per category',
     totalAmount: 'Total Amount',
     noExpenseData: 'No expense data for selected filters',
+    loadAnotherFile: 'Load another file',
+    proceed: 'Proceed',
   },
   pl: {
     accounts: 'Rachunki',
@@ -154,6 +156,8 @@ export const dictionaries = {
     expensesPerCategory: 'Wydatki według kategorii',
     totalAmount: 'Łączna kwota',
     noExpenseData: 'Brak danych o wydatkach dla wybranych filtrów',
+    loadAnotherFile: 'Wczytaj inny plik',
+    proceed: 'Kontynuuj',
   },
 };
 
