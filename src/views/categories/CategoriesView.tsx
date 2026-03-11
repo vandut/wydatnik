@@ -6,6 +6,7 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 import CategoryModal from './CategoryModal';
 import ConfirmDeleteCategoryModal from './ConfirmDeleteCategoryModal';
 import { cn } from '../../lib/utils';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 // --- INNER COMPONENTS ---
 
@@ -142,6 +143,8 @@ const CategoriesView: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+
+  useDocumentTitle(`${t('categories')} - Wydatnik`);
 
   const mainCategories = state.categories.filter(c => !c.parentId);
 

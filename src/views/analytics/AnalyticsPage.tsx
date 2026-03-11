@@ -6,10 +6,13 @@ import { SYSTEM_CATEGORY_INCOME, SYSTEM_CATEGORY_INVESTMENT } from '../../store/
 import MonthRangePicker from './MonthRangePicker';
 import CategoryFilterTable from './CategoryFilterTable';
 import AnalyticsCharts from './AnalyticsCharts';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 const AnalyticsPage: React.FC = () => {
   const { t } = useI18n();
   const { state } = useAppContext();
+
+  useDocumentTitle(`${t('analytics')} - Wydatnik`);
 
   // Default to last 12 months
   const defaultEnd = new Date();

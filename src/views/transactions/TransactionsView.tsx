@@ -11,6 +11,7 @@ import ImportModal from './ImportModal';
 import Drawer from '../../components/Drawer';
 import TransactionCategories from './TransactionCategories';
 import TransactionsTable from './TransactionsTable';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 // --- INNER COMPONENTS ---
 
@@ -157,6 +158,11 @@ const TransactionsView: React.FC = () => {
 
   const dateLocale = language === 'pl' ? pl : enUS;
   const selectedMonth = format(currentDate, 'yyyy-MM');
+  
+  // Format month for title: e.g., "Marzec 2026" or "March 2026"
+  const formattedMonth = format(currentDate, 'LLLL yyyy', { locale: dateLocale });
+  const capitalizedMonth = formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
+  useDocumentTitle(`${t('transactions')} ${capitalizedMonth} - Wydatnik`);
 
   // Get all available months from transactions
   const availableMonths = useMemo(() => {

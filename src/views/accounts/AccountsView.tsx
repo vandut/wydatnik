@@ -2,10 +2,13 @@ import React from 'react';
 import { useI18n } from '../../i18n/I18nContext';
 import { useAppContext } from '../../store/AppContext';
 import { Wallet } from 'lucide-react';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 const AccountsView: React.FC = () => {
   const { t } = useI18n();
   const { state, dispatch } = useAppContext();
+
+  useDocumentTitle(`${t('accounts')} - Wydatnik`);
 
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto w-full space-y-6">
