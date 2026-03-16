@@ -22,6 +22,7 @@ const HeaderCheckbox: React.FC<{
   <div className="flex items-center h-full mt-0.5">
     <input
       type="checkbox"
+      data-testid="header-checkbox"
       checked={isChecked}
       onChange={onChange}
       disabled={isDisabled}
@@ -95,6 +96,7 @@ const DesktopTableHeader: React.FC<{
                 </div>
                 <button
                   onClick={onEdit}
+                  data-testid="edit-btn"
                   disabled={selectedCount !== 1}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
@@ -103,6 +105,7 @@ const DesktopTableHeader: React.FC<{
                 </button>
                 <button
                   onClick={onSplit}
+                  data-testid="split-btn"
                   disabled={selectedCount !== 1}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
@@ -111,6 +114,7 @@ const DesktopTableHeader: React.FC<{
                 </button>
                 <button
                   onClick={onMerge}
+                  data-testid="merge-btn"
                   disabled={selectedCount < 2}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
@@ -119,6 +123,7 @@ const DesktopTableHeader: React.FC<{
                 </button>
                 <button
                   onClick={onDelete}
+                  data-testid="delete-btn"
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-rose-600 text-sm font-medium rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -180,6 +185,7 @@ const MobileTableHeader: React.FC<{
             <div className="flex items-center gap-2">
               <button
                 onClick={onEdit}
+                data-testid="edit-btn"
                 disabled={selectedCount !== 1}
                 className="p-1.5 bg-white text-indigo-700 rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
@@ -187,6 +193,7 @@ const MobileTableHeader: React.FC<{
               </button>
               <button
                 onClick={onSplit}
+                data-testid="split-btn"
                 disabled={selectedCount !== 1}
                 className="p-1.5 bg-white text-indigo-700 rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
@@ -194,6 +201,7 @@ const MobileTableHeader: React.FC<{
               </button>
               <button
                 onClick={onMerge}
+                data-testid="merge-btn"
                 disabled={selectedCount < 2}
                 className="p-1.5 bg-white text-indigo-700 rounded-lg border border-indigo-200 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
@@ -201,6 +209,7 @@ const MobileTableHeader: React.FC<{
               </button>
               <button
                 onClick={onDelete}
+                data-testid="delete-btn"
                 className="p-1.5 bg-white text-rose-600 rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
@@ -320,6 +329,7 @@ const TransactionRowFull: React.FC<{
         <div className="flex items-center h-full mt-0.5">
           <input
             type="checkbox"
+            data-testid="row-checkbox"
             checked={isSelected}
             onChange={onSelect}
             className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
@@ -339,6 +349,7 @@ const TransactionRowFull: React.FC<{
           onChange={(categoryId) => onUpdateCategory(transaction.id, categoryId)}
           getCategoryEmoji={getCategoryEmoji}
           onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? transaction.id : null)}
+          data-testid="category-dropdown"
         />
       </td>
       <td className={cn("p-4 text-right font-medium whitespace-nowrap", isNotExpense ? "text-slate-800" : transaction.amount > 0 ? "text-emerald-600" : "text-slate-800")}>
@@ -381,6 +392,7 @@ const TransactionRowMid: React.FC<{
           <div className="flex items-center h-full mt-0.5">
             <input
               type="checkbox"
+              data-testid="row-checkbox"
               checked={isSelected}
               onChange={onSelect}
               className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
@@ -407,6 +419,7 @@ const TransactionRowMid: React.FC<{
             onChange={(categoryId) => onUpdateCategory(transaction.id, categoryId)}
             getCategoryEmoji={getCategoryEmoji}
             onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? transaction.id : null)}
+            data-testid="category-dropdown"
           />
         </td>
       </tr>
@@ -447,6 +460,7 @@ const TransactionRowSmall: React.FC<{
           <div className="flex items-start pt-1">
             <input
               type="checkbox"
+              data-testid="row-checkbox"
               checked={isSelected}
               onChange={onSelect}
               className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
@@ -477,6 +491,7 @@ const TransactionRowSmall: React.FC<{
             onChange={(categoryId) => onUpdateCategory(transaction.id, categoryId)}
             getCategoryEmoji={getCategoryEmoji}
             onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? transaction.id : null)}
+            data-testid="category-dropdown"
           />
         </td>
       </tr>
@@ -643,7 +658,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const commonCategoryId = allSameCategory ? selectedTransactionsList[0].categoryId : undefined;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden" data-testid="transactions-table">
       <div className="overflow-x-auto md:overflow-visible">
         <table className="w-full text-left text-sm table-fixed">
           <thead className={cn("border-b border-slate-200 text-slate-500 font-medium", selectedCount > 0 ? "bg-indigo-50/50" : "bg-slate-50/80")}>
@@ -684,7 +699,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
             <NoTransactionsRow selectedCategory={selectedCategory} categories={categories} />
           ) : (
             sortedTransactions.map(transaction => (
-              <tbody key={transaction.id} className={cn("transition-colors border-b xl:border-none border-slate-100", selectedTransactions.has(transaction.id) && "bg-indigo-50/30", openDropdownId === transaction.id ? "" : "hover:bg-slate-50/80")}>
+              <tbody key={transaction.id} data-testid={`transaction-row-${transaction.id}`} className={cn("transition-colors border-b xl:border-none border-slate-100", selectedTransactions.has(transaction.id) && "bg-indigo-50/30", openDropdownId === transaction.id ? "" : "hover:bg-slate-50/80")}>
                 {/* Desktop Row */}
                 <TransactionRowFull
                   transaction={transaction}

@@ -28,7 +28,7 @@ const DesktopSidebar: React.FC<{
   fileInputRef: React.RefObject<HTMLInputElement>;
   t: (key: string) => string;
 }> = ({ navItems, handleSave, handleLoad, fileInputRef, t }) => (
-  <aside className="hidden xl:flex flex-col w-64 bg-white border-r border-slate-200">
+  <aside className="hidden xl:flex flex-col w-64 bg-white border-r border-slate-200" data-testid="desktop-sidebar">
     <div className="p-6 flex items-center gap-3">
       <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">
         W
@@ -41,6 +41,7 @@ const DesktopSidebar: React.FC<{
         <NavLink
           key={item.to}
           to={item.to}
+          data-testid={`nav-link-${item.to.replace('/', '')}`}
           className={({ isActive }) =>
             cn(
               "flex items-center gap-3 px-3 py-2 rounded-xl transition-colors font-medium text-sm",
@@ -60,6 +61,7 @@ const DesktopSidebar: React.FC<{
       <div className="flex gap-2">
         <button 
           onClick={() => fileInputRef.current?.click()}
+          data-testid="load-btn"
           className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
         >
           <FolderOpen className="w-3.5 h-3.5" />
@@ -67,6 +69,7 @@ const DesktopSidebar: React.FC<{
         </button>
         <button 
           onClick={handleSave}
+          data-testid="save-btn"
           className="flex-1 flex justify-center items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
         >
           <Save className="w-3.5 h-3.5" />
@@ -90,7 +93,7 @@ const MobileHeader: React.FC<{
   t: (key: string) => string;
   location: { pathname: string };
 }> = ({ handleSave, fileInputRef, t, location }) => (
-  <header className="xl:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 z-10 shrink-0">
+  <header className="xl:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 z-10 shrink-0" data-testid="mobile-header">
     <div className="flex items-center gap-2">
       <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">
         W
@@ -100,6 +103,7 @@ const MobileHeader: React.FC<{
     <div className="flex items-center gap-2">
       <button 
         onClick={() => fileInputRef.current?.click()}
+        data-testid="mobile-load-btn"
         className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium cursor-pointer"
         title={t('load')}
       >
@@ -108,6 +112,7 @@ const MobileHeader: React.FC<{
       </button>
       <button 
         onClick={handleSave}
+        data-testid="mobile-save-btn"
         className="p-2 md:px-3 md:py-2 flex items-center gap-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium cursor-pointer"
         title={t('save')}
       >
@@ -131,11 +136,12 @@ const MobileHeader: React.FC<{
 );
 
 const MobileBottomNav: React.FC<{ navItems: NavItem[] }> = ({ navItems }) => (
-  <nav className="xl:hidden bg-white border-t border-slate-200 pb-safe flex justify-around p-2 z-10">
+  <nav className="xl:hidden bg-white border-t border-slate-200 pb-safe flex justify-around p-2 z-10" data-testid="mobile-bottom-nav">
     {navItems.map((item) => (
       <NavLink
         key={item.to}
         to={item.to}
+        data-testid={`mobile-nav-link-${item.to.replace('/', '')}`}
         className={({ isActive }) =>
           cn(
             "flex flex-col items-center gap-1 p-2 rounded-lg min-w-[64px]",

@@ -45,6 +45,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ category, categories, onC
         <>
           <button
             onClick={onClose}
+            data-testid="cancel-category-btn"
             className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
           >
             {t('cancel')}
@@ -52,6 +53,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ category, categories, onC
           <button
             onClick={handleSave}
             disabled={!name.trim()}
+            data-testid="save-category-btn"
             className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
           >
             {t('saveChanges')}
@@ -66,6 +68,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ category, categories, onC
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            data-testid="category-name-input"
             className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
             autoFocus
           />
@@ -76,6 +79,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ category, categories, onC
           <select
             value={parentId || ''}
             onChange={(e) => setParentId(e.target.value || null)}
+            data-testid="category-parent-select"
             className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer"
           >
             <option value="">{t('none')}</option>
@@ -93,6 +97,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ category, categories, onC
               value={emoji}
               onChange={(e) => setEmoji(e.target.value)}
               maxLength={2}
+              data-testid="category-emoji-input"
               className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
             />
           </div>
@@ -105,6 +110,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ category, categories, onC
             checked={effectiveIsNotExpense}
             onChange={(e) => setIsNotExpense(e.target.checked)}
             disabled={isParentNotExpense}
+            data-testid="category-exclude-checkbox"
             className={cn(
               "w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500",
               isParentNotExpense ? "opacity-50 cursor-not-allowed" : "cursor-pointer"

@@ -112,6 +112,7 @@ const MonthDropdown: React.FC<MonthDropdownProps> = ({ currentDate, setCurrentDa
           <button
             key={monthStr}
             onClick={() => handleSelect(monthStr)}
+            data-testid={`month-option-${monthStr}`}
             className={cn(
               "w-full text-left px-3 py-2 rounded-md text-sm transition-colors cursor-pointer capitalize",
               isSelected ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"
@@ -129,6 +130,7 @@ const MonthDropdown: React.FC<MonthDropdownProps> = ({ currentDate, setCurrentDa
       <button
         ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
+        data-testid="month-dropdown-trigger"
         className={cn(
           "flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer min-w-[160px] justify-center border",
           isOpen ? "border-indigo-500 bg-white" : "border-transparent hover:bg-slate-100",
@@ -150,6 +152,7 @@ const MonthDropdown: React.FC<MonthDropdownProps> = ({ currentDate, setCurrentDa
       {isOpen && createPortal(
         <div
           ref={dropdownRef}
+          data-testid="month-dropdown-desktop"
           className={cn(
             "hidden xl:block bg-white border border-indigo-500 shadow-lg overflow-y-auto",
             position === 'bottom' ? "rounded-b-lg rounded-t-none border-t-0" : "rounded-t-lg rounded-b-none border-b-0"
@@ -167,7 +170,7 @@ const MonthDropdown: React.FC<MonthDropdownProps> = ({ currentDate, setCurrentDa
       {isOpen && createPortal(
         <div className="xl:hidden fixed inset-0 z-[60] flex flex-col bg-black/50 animate-in fade-in duration-200 items-center justify-end md:p-4 md:pb-0">
           <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
-          <div ref={mobileDropdownRef} className="bg-white rounded-t-2xl md:rounded-b-none flex flex-col max-h-[80vh] w-full md:max-w-md animate-in slide-in-from-bottom-8 duration-200">
+          <div ref={mobileDropdownRef} data-testid="month-dropdown-mobile" className="bg-white rounded-t-2xl md:rounded-b-none flex flex-col max-h-[80vh] w-full md:max-w-md animate-in slide-in-from-bottom-8 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
               <h2 className="text-lg font-semibold text-slate-800">{t('selectMonth')}</h2>
               <button 

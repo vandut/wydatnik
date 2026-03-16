@@ -17,11 +17,12 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
         className="fixed inset-0 bg-black/20" 
         onClick={onClose}
       />
-      <div className="absolute right-0 top-0 bottom-0 w-[80%] bg-white shadow-xl animate-in slide-in-from-right flex flex-col">
+      <div className="absolute right-0 top-0 bottom-0 w-[80%] bg-white shadow-xl animate-in slide-in-from-right flex flex-col" data-testid="drawer">
         <div className="flex items-center justify-between p-4 border-b border-slate-200 shrink-0 h-[65px]">
           <h2 className="font-semibold text-slate-800">{title}</h2>
           <button
             onClick={onClose}
+            data-testid="drawer-close-btn"
             className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
           >
             <Menu className="w-5 h-5" />

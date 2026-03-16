@@ -38,7 +38,7 @@ const DateNavigation: React.FC<{
 }> = ({ currentDate, setCurrentDate, availableMonths }) => {
   const { t } = useI18n();
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2" data-testid="date-navigation">
       <button onClick={() => setCurrentDate(new Date())} className="mr-2 px-3 py-1.5 text-sm font-medium text-slate-600 bg-slate-200/50 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
         {t('today')}
       </button>
@@ -70,6 +70,7 @@ const TopSearch: React.FC<{
       </div>
       <input
         type="text"
+        data-testid="search-input"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder={t('search')}
@@ -112,6 +113,7 @@ const TransactionsHeader: React.FC<{
       )}>
         <button
           onClick={onImportClick}
+          data-testid="import-btn"
           className="flex items-center gap-2 px-3 md:px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
         >
           <UploadCloud className="w-4 h-4" />
@@ -320,7 +322,7 @@ const TransactionsView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full relative overflow-hidden">
+    <div className="flex flex-col md:flex-row h-full relative overflow-hidden" data-testid="transactions-view">
       {/* Mobile Categories Drawer */}
       <Drawer
         isOpen={isMobileCategoriesOpen}

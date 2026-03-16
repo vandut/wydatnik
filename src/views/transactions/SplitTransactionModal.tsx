@@ -74,6 +74,7 @@ const SplitTransactionModal: React.FC<SplitTransactionModalProps> = ({
         <>
           <button
             onClick={onClose}
+            data-testid="cancel-split-btn"
             className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
           >
             {t('cancel')}
@@ -81,6 +82,7 @@ const SplitTransactionModal: React.FC<SplitTransactionModalProps> = ({
           <button
             onClick={handleSave}
             disabled={!description.trim() || isAfter(new Date(fromYear, fromMonth, 1), new Date(toYear, toMonth, 1))}
+            data-testid="save-split-btn"
             className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {t('save')}
@@ -94,6 +96,7 @@ const SplitTransactionModal: React.FC<SplitTransactionModalProps> = ({
           <input
             type="text"
             value={description}
+            data-testid="split-title-input"
             onChange={(e) => setDescription(e.target.value)}
             className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
           />
@@ -105,6 +108,7 @@ const SplitTransactionModal: React.FC<SplitTransactionModalProps> = ({
             <div className="flex gap-2">
               <select
                 value={fromMonth}
+                data-testid="split-from-month"
                 onChange={(e) => setFromMonth(parseInt(e.target.value))}
                 className="flex-1 px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               >
@@ -114,6 +118,7 @@ const SplitTransactionModal: React.FC<SplitTransactionModalProps> = ({
               </select>
               <select
                 value={fromYear}
+                data-testid="split-from-year"
                 onChange={(e) => setFromYear(parseInt(e.target.value))}
                 className="flex-1 px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               >
@@ -128,6 +133,7 @@ const SplitTransactionModal: React.FC<SplitTransactionModalProps> = ({
             <div className="flex gap-2">
               <select
                 value={toMonth}
+                data-testid="split-to-month"
                 onChange={(e) => setToMonth(parseInt(e.target.value))}
                 className="flex-1 px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               >
@@ -137,6 +143,7 @@ const SplitTransactionModal: React.FC<SplitTransactionModalProps> = ({
               </select>
               <select
                 value={toYear}
+                data-testid="split-to-year"
                 onChange={(e) => setToYear(parseInt(e.target.value))}
                 className="flex-1 px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               >

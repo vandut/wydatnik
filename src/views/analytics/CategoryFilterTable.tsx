@@ -135,7 +135,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" data-testid="category-filter-table">
       <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
         <h3 className="font-semibold text-slate-800">{t('expensesPerCategory')}</h3>
       </div>
@@ -149,6 +149,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                   type="checkbox"
                   checked={isAllSelected}
                   onChange={handleToggleAll}
+                  data-testid="toggle-all-categories"
                   className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
               </th>
@@ -164,6 +165,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                   type="checkbox"
                   checked={selectedCategoryIds.has(null)}
                   onChange={() => handleToggleCategory(null)}
+                  data-testid="toggle-category-uncategorized"
                   className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
               </td>
@@ -198,6 +200,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                           if (el) el.indeterminate = isIndeterminate;
                         }}
                         onChange={() => handleToggleCategory(parent.id)}
+                        data-testid={`toggle-category-${parent.id}`}
                         className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                       />
                     </td>
@@ -228,6 +231,7 @@ const CategoryFilterTable: React.FC<CategoryFilterTableProps> = ({
                                         type="checkbox"
                                         checked={selectedCategoryIds.has(sub.id)}
                                         onChange={() => handleToggleCategory(sub.id)}
+                                        data-testid={`toggle-category-${sub.id}`}
                                         className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                                       />
                                     </td>

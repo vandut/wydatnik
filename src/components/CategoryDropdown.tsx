@@ -140,6 +140,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
       <div className="p-1">
         <button
           onClick={() => handleSelect(null)}
+          data-testid="category-option-uncategorized"
           className={cn(
             "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
             categoryId === null ? "text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"
@@ -155,6 +156,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
             <div key={main.id} className="mt-2">
               <button
                 onClick={() => handleSelect(main.id)}
+                data-testid={`category-option-main-${main.id}`}
                 className={cn(
                   "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 cursor-pointer",
                   categoryId === main.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50 font-medium"
@@ -178,6 +180,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
                     
                     <button
                       onClick={() => handleSelect(sub.id)}
+                      data-testid={`category-option-sub-${sub.id}`}
                       className={cn(
                         "w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors cursor-pointer",
                         categoryId === sub.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"
@@ -200,6 +203,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
       <button
         ref={triggerRef}
         type="button"
+        data-testid="category-dropdown-trigger"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "w-full bg-white border flex items-center gap-2 text-left focus:outline-none cursor-pointer",
@@ -252,6 +256,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
       {isOpen && createPortal(
         <div
           ref={dropdownRef}
+          data-testid="category-dropdown-desktop"
           className={cn(
             "hidden xl:block bg-white border border-indigo-500 shadow-lg overflow-y-auto",
             position === 'bottom' ? "rounded-b-xl rounded-t-none border-t-0" : "rounded-t-xl rounded-b-none border-b-0"
@@ -269,7 +274,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
       {isOpen && createPortal(
         <div className="xl:hidden fixed inset-0 z-[60] flex flex-col bg-black/50 animate-in fade-in duration-200 items-center justify-end md:p-4 md:pb-0">
           <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
-          <div ref={mobileDropdownRef} className="bg-white rounded-t-2xl md:rounded-b-none flex flex-col max-h-[80vh] w-full md:max-w-md animate-in slide-in-from-bottom-8 duration-200">
+          <div ref={mobileDropdownRef} data-testid="category-dropdown-mobile" className="bg-white rounded-t-2xl md:rounded-b-none flex flex-col max-h-[80vh] w-full md:max-w-md animate-in slide-in-from-bottom-8 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
               <h2 className="text-lg font-semibold text-slate-800">{t('selectCategory')}</h2>
               <button 

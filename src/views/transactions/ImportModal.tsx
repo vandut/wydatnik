@@ -71,8 +71,8 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }
   const renderContent = () => {
     if (error) {
       return (
-        <div className="space-y-4">
-          <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-start gap-3">
+        <div className="space-y-4" data-testid="import-modal">
+          <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-start gap-3" data-testid="import-error-msg">
             <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium mb-1">{t('importError')}</h4>
@@ -82,12 +82,14 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button
               onClick={onClose}
+              data-testid="import-cancel-btn"
               className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors"
             >
               {t('cancel')}
             </button>
             <button
               onClick={handleReset}
+              data-testid="import-reset-btn"
               className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors"
             >
               {t('loadAnotherFile') || 'Load another file'}
@@ -106,8 +108,8 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }
       };
 
       return (
-        <div className="space-y-4">
-          <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 space-y-3">
+        <div className="space-y-4" data-testid="import-modal">
+          <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 space-y-3" data-testid="import-summary-view">
             <div className="flex items-center gap-2 text-emerald-700 font-medium pb-2 border-b border-emerald-200/50">
               <CheckCircle2 className="w-5 h-5" />
               {t('importSuccess') || 'File parsed successfully'}
@@ -127,18 +129,21 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button
               onClick={handleReset}
+              data-testid="import-reset-btn"
               className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors"
             >
               {t('loadAnotherFile') || 'Load another file'}
             </button>
             <button
               onClick={onClose}
+              data-testid="import-cancel-btn"
               className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors"
             >
               {t('cancel')}
             </button>
             <button
               onClick={handleProceed}
+              data-testid="import-proceed-btn"
               className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors"
             >
               {t('proceed') || 'Proceed'}
@@ -149,12 +154,13 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }
     }
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="import-modal">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">{t('importFormat')}</label>
           <select 
             value={format} 
             onChange={(e) => setFormat(e.target.value)}
+            data-testid="import-format-select"
             className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer"
           >
             <option value="mbank">{t('mBankCSV')}</option>
@@ -162,6 +168,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }
         </div>
 
         <div 
+          data-testid="import-dropzone"
           className={`border-2 border-dashed rounded-2xl p-8 text-center transition-colors cursor-pointer ${
             isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
           }`}
@@ -174,6 +181,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, onImport, currency }
           <p className="text-sm text-slate-600 font-medium">{t('dropFileHere')}</p>
           <input 
             type="file" 
+            data-testid="import-file-input"
             className="hidden" 
             accept=".csv" 
             ref={fileInputRef}

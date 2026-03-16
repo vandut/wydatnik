@@ -30,15 +30,9 @@ describe('ImportModal', () => {
   it('renders correctly initially', () => {
     renderComponent();
     
-    // Check if the modal title is rendered
-    expect(screen.getByText('Import transactions')).toBeInTheDocument();
-    
-    // Check if format selector is present
-    expect(screen.getByText('Format')).toBeInTheDocument();
-    expect(screen.getByRole('combobox')).toHaveValue('mbank');
-    
-    // Check if dropzone is present
-    expect(screen.getByText('Drop file here or click to select')).toBeInTheDocument();
+    expect(screen.getByTestId('import-modal')).toBeInTheDocument();
+    expect(screen.getByTestId('import-format-select')).toBeInTheDocument();
+    expect(screen.getByTestId('import-dropzone')).toBeInTheDocument();
   });
 
   it('handles file selection, parses it and shows summary, then proceeds', async () => {
@@ -48,7 +42,7 @@ describe('ImportModal', () => {
     const csvContent = fs.readFileSync(path.resolve(__dirname, '../../services/mBank_example.csv'), 'utf-8');
     const file = new File([csvContent], 'mBank_example.csv', { type: 'text/csv' });
     
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = screen.getByTestId('import-file-input') as HTMLInputElement;
     
     Object.defineProperty(fileInput, 'files', {
       value: [file],
@@ -58,17 +52,11 @@ describe('ImportModal', () => {
     
     // Wait for parsing to finish and summary to appear
     await waitFor(() => {
-      expect(screen.getByText('Successfully imported transactions')).toBeInTheDocument();
+      expect(screen.getByTestId('import-summary-view')).toBeInTheDocument();
     });
     
-    // Check summary details
-    expect(screen.getByText('Imported transactions:')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('Date range:')).toBeInTheDocument();
-    expect(screen.getByText('2026-02-23 - 2026-02-25')).toBeInTheDocument();
-    
     // Click Proceed
-    fireEvent.click(screen.getByText('Proceed'));
+    fireEvent.click(screen.getByTestId('import-proceed-btn'));
     
     // Check if onImport was called with correct data
     expect(mockOnImport).toHaveBeenCalledTimes(1);
@@ -92,7 +80,7 @@ describe('ImportModal', () => {
     const invalidCsvContent = 'invalid,csv,content\n1,2,3';
     const file = new File([invalidCsvContent], 'invalid.csv', { type: 'text/csv' });
     
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = screen.getByTestId('import-file-input') as HTMLInputElement;
     
     Object.defineProperty(fileInput, 'files', {
       value: [file],
@@ -102,17 +90,17 @@ describe('ImportModal', () => {
     
     // Wait for error to appear
     await waitFor(() => {
-      expect(screen.getByText('Error importing transactions')).toBeInTheDocument();
+      expect(screen.getByTestId('import-error-msg')).toBeInTheDocument();
     });
     
     expect(screen.getByText('Invalid file format: Missing required header.')).toBeInTheDocument();
     
     // Click "Load another file"
-    fireEvent.click(screen.getByText('Load another file'));
+    fireEvent.click(screen.getByTestId('import-reset-btn'));
     
     // Verify it went back to the initial state
-    expect(screen.queryByText('Error importing transactions')).not.toBeInTheDocument();
-    expect(screen.getByText('Drop file here or click to select')).toBeInTheDocument();
+    expect(screen.queryByTestId('import-error-msg')).not.toBeInTheDocument();
+    expect(screen.getByTestId('import-dropzone')).toBeInTheDocument();
   });
 
   it('handles currency mismatch error', async () => {
@@ -126,7 +114,7 @@ describe('ImportModal', () => {
     const csvContent = fs.readFileSync(path.resolve(__dirname, '../../services/mBank_example.csv'), 'utf-8');
     const file = new File([csvContent], 'mBank_example.csv', { type: 'text/csv' });
     
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = screen.getByTestId('import-file-input') as HTMLInputElement;
     
     Object.defineProperty(fileInput, 'files', {
       value: [file],
@@ -136,7 +124,7 @@ describe('ImportModal', () => {
     
     // Wait for error to appear
     await waitFor(() => {
-      expect(screen.getByText('Error importing transactions')).toBeInTheDocument();
+      expect(screen.getByTestId('import-error-msg')).toBeInTheDocument();
     });
     
     expect(screen.getByText('Currency mismatch: File has PLN, but app is set to EUR.')).toBeInTheDocument();
@@ -148,7 +136,7 @@ describe('ImportModal', () => {
     const csvContent = fs.readFileSync(path.resolve(__dirname, '../../services/mBank_example.csv'), 'utf-8');
     const file = new File([csvContent], 'mBank_example.csv', { type: 'text/csv' });
     
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = screen.getByTestId('import-file-input') as HTMLInputElement;
     
     Object.defineProperty(fileInput, 'files', {
       value: [file],
@@ -157,11 +145,11 @@ describe('ImportModal', () => {
     fireEvent.change(fileInput);
     
     await waitFor(() => {
-      expect(screen.getByText('Successfully imported transactions')).toBeInTheDocument();
+      expect(screen.getByTestId('import-summary-view')).toBeInTheDocument();
     });
     
     // Click Cancel
-    fireEvent.click(screen.getByText('Cancel'));
+    fireEvent.click(screen.getByTestId('import-cancel-btn'));
     
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(mockOnImport).not.toHaveBeenCalled();

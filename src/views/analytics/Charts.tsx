@@ -227,6 +227,7 @@ const Charts: React.FC<ChartsProps> = ({
             type="checkbox"
             checked={includeInvestments}
             onChange={(e) => setIncludeInvestments(e.target.checked)}
+            data-testid="include-investments-checkbox"
             className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
           />
           <span className="text-sm font-medium text-slate-700">
@@ -237,7 +238,7 @@ const Charts: React.FC<ChartsProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pie Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6" data-testid="pie-chart-container">
           <h3 className="text-lg font-semibold text-slate-800 mb-6">
             {t('expensesByCategory') || 'Expenses by Category'}
           </h3>
@@ -271,7 +272,7 @@ const Charts: React.FC<ChartsProps> = ({
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6" data-testid="bar-chart-container">
           <h3 className="text-lg font-semibold text-slate-800 mb-6">
             {t('monthlyOverview') || 'Monthly Overview'}
           </h3>

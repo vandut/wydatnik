@@ -18,12 +18,14 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ onClose, onConf
         <>
           <button
             onClick={onClose}
+            data-testid="cancel-delete-btn"
             className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
           >
             {t('cancel')}
           </button>
           <button
             onClick={onConfirm}
+            data-testid="confirm-delete-btn"
             className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors cursor-pointer"
           >
             {t('delete')}

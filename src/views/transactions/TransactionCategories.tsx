@@ -90,6 +90,7 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
       <div key={id} className="flex items-center w-full gap-0.5">
         <button
           onClick={() => setSelectedCategory(id)}
+          data-testid={`sidebar-category-${id}`}
           className={cn(
             "flex-1 flex items-center pl-3 pr-2 py-2 rounded-xl text-sm transition-colors cursor-pointer min-w-0",
             isMinimized ? "justify-center xl:justify-between" : "justify-between",
@@ -122,6 +123,7 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
           ) : (
             <div 
               onClick={hasChildren && onExpandToggle ? onExpandToggle : undefined}
+              data-testid={`sidebar-expand-${id}`}
               className={cn(
                 "p-0.5 transition-colors",
                 hasChildren ? "cursor-pointer text-slate-500 hover:text-slate-800" : "opacity-30 cursor-default text-slate-400"
@@ -164,6 +166,7 @@ const TransactionCategories: React.FC<TransactionCategoriesProps> = ({
           false,
           <div 
             onClick={toggleAll}
+            data-testid="sidebar-toggle-all"
             className="p-0.5 transition-colors cursor-pointer text-slate-500 hover:text-slate-800"
             title={areAllExpanded ? "Collapse all" : "Expand all"}
           >

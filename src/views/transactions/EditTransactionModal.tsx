@@ -41,6 +41,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         <>
           <button
             onClick={onClose}
+            data-testid="cancel-edit-btn"
             className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
           >
             {t('cancel')}
@@ -48,6 +49,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           <button
             onClick={handleSave}
             disabled={!description.trim() || !date}
+            data-testid="save-edit-btn"
             className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {t('save')}
@@ -61,6 +63,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           <input
             type="date"
             value={date}
+            data-testid="edit-date-input"
             onChange={(e) => setDate(e.target.value)}
             className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
           />
@@ -70,6 +73,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           <input
             type="text"
             value={description}
+            data-testid="edit-title-input"
             onChange={(e) => setDescription(e.target.value)}
             className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
           />

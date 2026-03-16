@@ -62,10 +62,10 @@ const SubcategoryList: React.FC<{
                 <div className="flex items-center gap-1 shrink-0">
                   {!sub.isSystem && (
                     <>
-                      <button onClick={() => onEdit(sub)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
+                      <button onClick={() => onEdit(sub)} data-testid={`edit-category-btn-${sub.id}`} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => onDelete(sub.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
+                      <button onClick={() => onDelete(sub.id)} data-testid={`delete-category-btn-${sub.id}`} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </>
@@ -96,7 +96,7 @@ const CategoryCard: React.FC<{
 }> = ({ main, categories, onEdit, onDelete }) => {
   const { t } = useI18n();
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col" data-testid={`category-card-${main.id}`}>
       <div className="flex items-start justify-between p-4 bg-white border-b border-slate-100/50 z-10 relative gap-2">
         <div className="flex items-start gap-3 min-w-0 flex-1">
           <span className="text-xl shrink-0 mt-0.5">{main.emoji}</span>
@@ -112,10 +112,10 @@ const CategoryCard: React.FC<{
         <div className="flex items-center gap-1 shrink-0 mt-0.5">
           {!main.isSystem && (
             <>
-              <button onClick={() => onEdit(main)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
+              <button onClick={() => onEdit(main)} data-testid={`edit-category-btn-${main.id}`} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer">
                 <Edit2 className="w-4 h-4" />
               </button>
-              <button onClick={() => onDelete(main.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
+              <button onClick={() => onDelete(main.id)} data-testid={`delete-category-btn-${main.id}`} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer">
                 <Trash2 className="w-4 h-4" />
               </button>
             </>
@@ -180,11 +180,12 @@ const CategoriesView: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto w-full space-y-6">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto w-full space-y-6" data-testid="categories-view">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">{t('categories')}</h1>
         <button
           onClick={openAdd}
+          data-testid="add-category-btn"
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" />

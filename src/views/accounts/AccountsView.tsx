@@ -31,6 +31,7 @@ const AccountsView: React.FC = () => {
               <label className="block text-sm font-medium text-slate-700 mb-1">{t('currency')}</label>
               <input
                 type="text"
+                data-testid="currency-input"
                 value={state.currency}
                 onChange={(e) => dispatch({ type: 'SET_CURRENCY', payload: e.target.value.toUpperCase() })}
                 maxLength={3}

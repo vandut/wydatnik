@@ -24,6 +24,7 @@ const MonthRangePicker: React.FC<MonthRangePickerProps> = ({
           type="month" 
           value={startMonth}
           onChange={(e) => onStartMonthChange(e.target.value)}
+          data-testid="start-month-input"
           className="w-full sm:w-auto px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 h-[34px]"
         />
       </div>
@@ -36,6 +37,7 @@ const MonthRangePicker: React.FC<MonthRangePickerProps> = ({
           type="month" 
           value={endMonth}
           onChange={(e) => onEndMonthChange(e.target.value)}
+          data-testid="end-month-input"
           className="w-full sm:w-auto px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 h-[34px]"
         />
       </div>

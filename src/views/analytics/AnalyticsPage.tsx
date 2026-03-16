@@ -53,7 +53,7 @@ const AnalyticsPage: React.FC = () => {
   }, [state.categories]);
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 overflow-y-auto">
+    <div className="flex flex-col h-full bg-slate-50 overflow-y-auto" data-testid="analytics-view">
       <div className="p-4 md:p-6 max-w-7xl mx-auto w-full space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h1 className="text-2xl font-bold text-slate-900">{t('analytics')}</h1>
